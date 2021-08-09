@@ -28,21 +28,16 @@ public class PlayerMovement : MonoBehaviour
     {
         // Define input actions
         controls = new PlayerInputActions();
-        controls.Player.Move.performed += ctx => horizontalMove = ctx.ReadValue<float>();
-        controls.Player.Jump.started += ctx => jump = true;
-        controls.Player.Jump.canceled += ctx => jumpRelease = true;
+        controls.Gameplay.Movement.performed += ctx => horizontalMove = ctx.ReadValue<float>();
+        controls.Gameplay.Jump.started += ctx => jump = true;
+        controls.Gameplay.Jump.canceled += ctx => jumpRelease = true;
         // controls.Player.Shield.started += ctx => ShieldActivate();
         // controls.Player.Shield.canceled += ctx => ShieldDisactive();
     }
 
     private void FixedUpdate()
     {
-        // Checking if shields is on (might use shieldIsOn instead of ableToMove)
-        if (ableToMove)
-            controller.Move(horizontalMove * Time.fixedDeltaTime * runSpeed, jump, jumpRelease);
-        else if(!ableToMove)
-            controller.Move(0, jump, jumpRelease);
-
+        controller.Move(horizontalMove * Time.fixedDeltaTime * runSpeed, jump, jumpRelease);       
         // Jump switch to false
         jump = false;
     }
