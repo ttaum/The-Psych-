@@ -49,8 +49,5 @@ public class PlayerInAirState : PlayerState
         base.PhysicsUpdate();
 
         player.CheckYarn();
-
-    //    player.SetRotation(player.CurrentAngleGr);
-
     }
 }

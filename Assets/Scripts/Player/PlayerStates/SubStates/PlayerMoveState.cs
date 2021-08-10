@@ -46,7 +46,5 @@ public class PlayerMoveState : PlayerGroundedState
 
         player.CheckYarn();
 
-     //   player.SetRotation(player.CurrentAngleGr);
-
     }
 }

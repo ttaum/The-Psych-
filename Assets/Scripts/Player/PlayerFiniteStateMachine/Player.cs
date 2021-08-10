@@ -123,28 +123,24 @@ public class Player : MonoBehaviour
     public void SetRotation(float CurrentAngleGr)
     {
         // Euler -> quaternion
-        CurrentEuler = new Vector3(0f, 0f, CurrentAngleGr);
-        CurrentQuat.eulerAngles = CurrentEuler;
+        CurrentQuat.eulerAngles = new Vector3(0f, 0f, CurrentAngleGr);
 
-        if(transform.rotation != CurrentQuat)
+        // rotate Player
+        if(Quaternion.Angle(transform.rotation, CurrentQuat) > .5f)
         {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, CurrentQuat, smoothDampRotation);
-            
         }
-        // rotate Player
-
+            
         // Rotate camera
-        if (SmoothAngle != CurrentAngleGr)
+        if(Mathf.Abs(SmoothAngle - CurrentAngleGr) > .5f)
         {
             SmoothAngle = Mathf.Lerp(SmoothAngle, CurrentAngleGr, smoothDampCam * Time.fixedDeltaTime);
             vcam.m_Lens.Dutch = SmoothAngle;
-            Debug.Log("SET ROTATION");
         }
+        
 
         // Apply new gravity vector according to normal hit
-        Physics2D.gravity = new Vector3(CurrentVector.x, CurrentVector.y, 0f) * 9.8f;
-
-        
+       // Physics2D.gravity = new Vector3(CurrentVector.x, CurrentVector.y, 0f) * 9.8f;       
     }
 
     #endregion
@@ -159,8 +155,8 @@ public class Player : MonoBehaviour
         // the angle to rotate character/gravity/horizontalInput/jumpForce direction.
         if (hit)
         {
-            CurrentAngleGr = -Vector2.SignedAngle(hit.normal, Vector2.up);
-
+            CurrentAngleGr = -Vector2.SignedAngle(hit.normal, Vector2.up);      
+                         
             // Define new direction for RaycastHit
             CurrentVector = -hit.normal;
 
@@ -168,9 +164,12 @@ public class Player : MonoBehaviour
 
             SetRotation(CurrentAngleGr);
 
-            Debug.DrawRay(hit.point, hit.normal, Color.green);
+            Physics2D.gravity = new Vector2(CurrentVector.x, CurrentVector.y) * 9.8f;
 
+            Debug.DrawRay(hit.point, hit.normal, Color.green);
         }
+
+
     }
     public void CheckIfFlip(float input)
     {
