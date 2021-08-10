@@ -89,6 +89,8 @@ public class Player : MonoBehaviour
     private void Update()
     {
         StateMachine.CurrentState.LogicUpdate();
+
+    //    Debug.Log(InputHandler.MouseInput);
     }
 
     private void FixedUpdate()

@@ -7,6 +7,7 @@ public class PlayerInputHandler : MonoBehaviour
 {
     public float MovementInput { get; private set; }
     public bool JumpInput { get; private set; }
+    public Vector2 MouseInput { get; private set; }
 
     [SerializeField]
     private float inputHoldTime = 0.2f;
@@ -20,6 +21,11 @@ public class PlayerInputHandler : MonoBehaviour
     public void OnMoveInput(InputAction.CallbackContext context)
     {
         MovementInput = context.ReadValue<float>();      
+    }
+
+    public void OnMouseInput(InputAction.CallbackContext context)
+    {
+        MouseInput = context.ReadValue<Vector2>();
     }
 
     public void OnJumpInput(InputAction.CallbackContext context)
