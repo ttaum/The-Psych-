@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class PlayerInAirState : PlayerState
 {
-    private int input;
+    private float input;
     private bool isGrounded;
     
-
     public PlayerInAirState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
     }
@@ -22,6 +21,8 @@ public class PlayerInAirState : PlayerState
     public override void Enter()
     {
         base.Enter();
+
+        player.isAirForceAllowed = true;
     }
 
     public override void Exit()
@@ -33,13 +34,21 @@ public class PlayerInAirState : PlayerState
     {
         base.LogicUpdate();
 
-        if(isGrounded && player.LocalRbVelocity().y < 0.01f)
+        input = player.InputHandler.MovementInput;
+
+        if (isGrounded && player.LocalRbVelocity().y < 0.01f)
         {
             stateMachine.ChangeState(player.LandState);
         }
         else
         {
             player.Anim.SetFloat("yVelocity", player.LocalRbVelocity().y);
+
+            if (player.isAirForceAllowed && input != 0)
+            {
+                player.SetAirForce(input);
+                player.isAirForceAllowed = false;
+            }
         }
 
     }

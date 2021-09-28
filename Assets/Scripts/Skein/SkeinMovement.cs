@@ -24,7 +24,6 @@ public class SkeinMovement : MonoBehaviour
     private void FixedUpdate()
     {
         Movement();
-        Debug.Log(InputHandler.MouseInput);
     }
 
     private Vector3 MousePosition() //Follow-point calculation

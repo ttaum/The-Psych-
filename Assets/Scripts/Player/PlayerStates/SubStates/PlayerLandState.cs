@@ -8,15 +8,18 @@ public class PlayerLandState : PlayerGroundedState
     {
     }
 
+    public override void Enter()
+    {
+        base.Enter();
+
+    }
     public override void LogicUpdate()
     {
         base.LogicUpdate();
 
         if (input != 0 && (stateMachine.CurrentState != player.JumpState))
         {
-            Debug.Log("pzdc");
             stateMachine.ChangeState(player.MoveState);
-            Debug.Log("norm");
         }
         else if (isAnimationFinished)
         {
