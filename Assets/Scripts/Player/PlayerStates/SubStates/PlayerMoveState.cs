@@ -27,7 +27,7 @@ public class PlayerMoveState : PlayerGroundedState
     public override void LogicUpdate()
     {
         
-        player.SetVelocity(input);
+        //player.SetVelocity(input);
 
         base.LogicUpdate();
 
@@ -43,6 +43,8 @@ public class PlayerMoveState : PlayerGroundedState
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
+
+        player.SetVelocity(input);
 
         player.CheckYarn();
 

@@ -150,8 +150,8 @@ MonoBehaviour:
   playerData: {fileID: 11400000, guid: afd81a8a71aac2b4f9547d06272c965e, type: 2}
   vcam: {fileID: 0}
   yarnMask: {fileID: 0}
-  movementSmoothing: 0.00045
-  smoothDampCam: 0.2
+  movementSmoothing: 0.001
+  smoothDampCam: 1
   smoothDampRotation: 1
   WhatIsYarn:
     serializedVersion: 2

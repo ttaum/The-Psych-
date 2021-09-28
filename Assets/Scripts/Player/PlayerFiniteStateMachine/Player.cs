@@ -31,6 +31,8 @@ public class Player : MonoBehaviour
 
     #region Check Transforms
 
+    [Header("Objects")]
+
     [SerializeField]
     private Transform groundCheck;
 
@@ -45,22 +47,35 @@ public class Player : MonoBehaviour
     private CinemachineVirtualCamera vcam;
 
     [SerializeField]
-    private GameObject yarnMask;
+    private SpriteMask yarnMask;
 
     private Vector3 refVelocity;
     public Vector2 LocalVelocity { get; private set; }
 
+    [Header("Smoothing and damping")]
+
     [Range(0, .01f)] [SerializeField] private float movementSmoothing = .01f;
     [Range(0, 5f)] [SerializeField] private float smoothDampCam = 1f;
     [Range(0, 25f)] [SerializeField] private float smoothDampRotation = 1f;
+    [Range(0, 25f)] [SerializeField] private float smoothDampMaskRotation = 1f;
+    [Range(0, 1f)] [SerializeField] private float maskMovementSmooth = 1f;
+
+    [Header("Other")]
+
     [SerializeField] private LayerMask WhatIsYarn;
     [SerializeField] private float YarnCheckDistance;
 
-    public float yarnMaskPosX { get; private set; } = 0f;
+    public float YarnMaskPosX { get; private set; }
 
     private bool facingRight = true;
 
     public bool isAirForceAllowed;
+
+    [Header("Other")]
+
+    [Range(0, 30f)] [SerializeField] private float offsetX;
+    [Range(-30f, 30f)] [SerializeField] private float offsetY;
+
 
     public Vector2 CurrentVector { get; private set; } = Vector2.down;
     public Vector3 CurrentEuler { get; private set; }
@@ -70,6 +85,10 @@ public class Player : MonoBehaviour
     public float CurrentAngleRad { get; private set; }
     public float SmoothAngle { get; private set; } = 0f;
     #endregion
+
+    private Vector3 velocity = Vector3.zero;
+
+    private Vector3 targetVector = Vector3.zero;
 
     #region Unity Callback Functions
 
@@ -82,6 +101,7 @@ public class Player : MonoBehaviour
         JumpState = new PlayerJumpState(this, StateMachine, playerData, "Jump");
         InAirState = new PlayerInAirState(this, StateMachine, playerData, "inAir");
         LandState = new PlayerLandState(this, StateMachine, playerData, "land");
+
     }
 
     private void Start()
@@ -93,6 +113,10 @@ public class Player : MonoBehaviour
         RB = GetComponent<Rigidbody2D>();
 
         StateMachine.Initialize(IdleState);
+
+        YarnMaskPosX = gameObject.transform.position.x;
+
+        targetVector = gameObject.transform.position;
     }
 
     private void Update()
@@ -151,20 +175,33 @@ public class Player : MonoBehaviour
         // Rotate camera
         if(Mathf.Abs(SmoothAngle - CurrentAngleGr) > .05f)
         {
-            SmoothAngle = Mathf.Lerp(SmoothAngle, CurrentAngleGr, smoothDampCam * Time.fixedDeltaTime);
+            SmoothAngle = Mathf.LerpAngle(SmoothAngle, CurrentAngleGr, smoothDampCam * Time.fixedDeltaTime);
             vcam.m_Lens.Dutch = SmoothAngle;
         }
-            
+
+        YarnMaskMovement();
+
     }
 
     public void YarnMaskMovement()
     {
-        if (transform.position.x > yarnMaskPosX)
-        {
 
+        if (transform.position.x > YarnMaskPosX)
+        {
+            Vector3 offsetWorld = transform.TransformDirection(new Vector3(offsetX, offsetY, 0f));
+
+            targetVector = gameObject.transform.position + offsetWorld;
+
+            YarnMaskPosX = transform.position.x;
         }
+
+        yarnMask.transform.position = Vector3.SmoothDamp(yarnMask.transform.position, targetVector, ref velocity, maskMovementSmooth);
+
+
+        yarnMask.transform.rotation = Quaternion.RotateTowards(yarnMask.transform.rotation,
+            gameObject.transform.rotation, smoothDampMaskRotation);
+
     }
-    
 
     #endregion
 
