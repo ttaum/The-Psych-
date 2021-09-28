@@ -10,6 +10,7 @@ public class PlayerData : ScriptableObject
 
     [Header("Jump State")]
     public float jumpForce = 500f;
+    public float airForce = 100f;
 
     [Header("Check variables")]
     public float groundCheckRadius = 0.3f;

@@ -18,10 +18,6 @@ public class Player : MonoBehaviour
 
     public PlayerLandState LandState { get; private set; }
 
-
-    [SerializeField]
-    private PlayerData playerData;
-
     #endregion
 
     #region Components
@@ -30,6 +26,8 @@ public class Player : MonoBehaviour
     public Rigidbody2D RB { get; private set; }
 
     #endregion
+
+
 
     #region Check Transforms
 
@@ -40,18 +38,29 @@ public class Player : MonoBehaviour
 
     #region Other variables
 
+    [SerializeField]
+    private PlayerData playerData;
+
+    [SerializeField]
+    private CinemachineVirtualCamera vcam;
+
+    [SerializeField]
+    private GameObject yarnMask;
 
     private Vector3 refVelocity;
     public Vector2 LocalVelocity { get; private set; }
 
-    [Range(0, .01f)] [SerializeField] private float movementSmoothing = .1f;
+    [Range(0, .01f)] [SerializeField] private float movementSmoothing = .01f;
     [Range(0, 5f)] [SerializeField] private float smoothDampCam = 1f;
     [Range(0, 25f)] [SerializeField] private float smoothDampRotation = 1f;
-    [SerializeField] public LayerMask WhatIsYarn;
-    [SerializeField] public float YarnCheckDistance;
-    [SerializeField] private CinemachineVirtualCamera vcam;
+    [SerializeField] private LayerMask WhatIsYarn;
+    [SerializeField] private float YarnCheckDistance;
 
-    public bool facingRight = true;
+    public float yarnMaskPosX { get; private set; } = 0f;
+
+    private bool facingRight = true;
+
+    public bool isAirForceAllowed;
 
     public Vector2 CurrentVector { get; private set; } = Vector2.down;
     public Vector3 CurrentEuler { get; private set; }
@@ -89,8 +98,6 @@ public class Player : MonoBehaviour
     private void Update()
     {
         StateMachine.CurrentState.LogicUpdate();
-
-    //    Debug.Log(InputHandler.MouseInput);
     }
 
     private void FixedUpdate()
@@ -117,6 +124,14 @@ public class Player : MonoBehaviour
         RB.AddForce(jumpForce, ForceMode2D.Impulse);      
     }
 
+    public void SetAirForce(float input)
+    {
+        Vector2 localAirForce = new Vector2(playerData.airForce * input, 0);
+        Vector2 AirForce = transform.TransformDirection(localAirForce);
+
+        RB.AddForce(AirForce, ForceMode2D.Impulse);
+    }
+
     public Vector2 LocalRbVelocity()
     {
         return transform.InverseTransformDirection(RB.velocity);
@@ -134,16 +149,22 @@ public class Player : MonoBehaviour
         }
             
         // Rotate camera
-        if(Mathf.Abs(SmoothAngle - CurrentAngleGr) > .5f)
+        if(Mathf.Abs(SmoothAngle - CurrentAngleGr) > .05f)
         {
             SmoothAngle = Mathf.Lerp(SmoothAngle, CurrentAngleGr, smoothDampCam * Time.fixedDeltaTime);
             vcam.m_Lens.Dutch = SmoothAngle;
         }
-        
-
-        // Apply new gravity vector according to normal hit
-       // Physics2D.gravity = new Vector3(CurrentVector.x, CurrentVector.y, 0f) * 9.8f;       
+            
     }
+
+    public void YarnMaskMovement()
+    {
+        if (transform.position.x > yarnMaskPosX)
+        {
+
+        }
+    }
+    
 
     #endregion
 
@@ -162,7 +183,7 @@ public class Player : MonoBehaviour
             // Define new direction for RaycastHit
             CurrentVector = -hit.normal;
 
-            CurrentAngleRad = CurrentAngleGr * Mathf.PI / 180;
+           // CurrentAngleRad = CurrentAngleGr * Mathf.PI / 180; hz vrode ne nado
 
             SetRotation(CurrentAngleGr);
 
@@ -191,6 +212,11 @@ public class Player : MonoBehaviour
     public bool CheckIfGrounded()
     {
         return Physics2D.OverlapCircle(groundCheck.position, playerData.groundCheckRadius, playerData.whatIsGround);
+    }
+
+    public void CheckIfAirForce(bool check)
+    {
+        isAirForceAllowed = check;
     }
 
     #endregion
