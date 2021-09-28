@@ -13,17 +13,12 @@ public class SkeinMovement : MonoBehaviour
 
     public PlayerInputHandler InputHandler { get; private set; }
 
-
-    //private PlayerController2D playerController;
-
     Transform myTransform;
 
     private void Awake()
     {
-
         InputHandler = player.GetComponent<PlayerInputHandler>();
-        myTransform = transform;
-     
+        myTransform = transform;   
     }
 
     private void FixedUpdate()
