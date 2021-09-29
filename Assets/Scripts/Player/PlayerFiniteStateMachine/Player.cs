@@ -180,7 +180,6 @@ public class Player : MonoBehaviour
         }
 
         YarnMaskMovement();
-
     }
 
     public void YarnMaskMovement()
