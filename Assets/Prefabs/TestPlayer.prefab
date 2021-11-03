@@ -16,9 +16,9 @@ GameObject:
   - component: {fileID: 6772214140460064939}
   - component: {fileID: 6772214140460064938}
   - component: {fileID: 6772214140460064933}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: TestPlayer
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -149,14 +149,15 @@ MonoBehaviour:
   groundCheck: {fileID: 6772214140773516092}
   playerData: {fileID: 11400000, guid: afd81a8a71aac2b4f9547d06272c965e, type: 2}
   vcam: {fileID: 0}
-  yarnMask: {fileID: 0}
   movementSmoothing: 0.001
   smoothDampCam: 1
   smoothDampRotation: 1
+  smoothDampMaskRotation: 1
+  maskMovementSmooth: 0.3
   WhatIsYarn:
     serializedVersion: 2
     m_Bits: 256
-  YarnCheckDistance: 3
+  YarnCheckDistance: 5
   isAirForceAllowed: 0
 --- !u!212 &6772214140460064936
 SpriteRenderer:
@@ -196,7 +197,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1416456081
-  m_SortingLayer: 3
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: -9095717837082945937, guid: 34587324d412940a79d530020c957dc0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -245,7 +246,7 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 5
   m_Material: {fileID: 0}
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -306,7 +307,7 @@ GameObject:
   - component: {fileID: 6772214141255153217}
   - component: {fileID: 6772214141255153216}
   - component: {fileID: 6772214141255153218}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Sputnik
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -365,7 +366,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1416456081
-  m_SortingLayer: 3
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: 4adeaf2d2b1c7417e89f026626d8264f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

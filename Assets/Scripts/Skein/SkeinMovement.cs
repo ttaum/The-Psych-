@@ -9,16 +9,18 @@ public class SkeinMovement : MonoBehaviour
     [SerializeField] private float distDamp = 10f;  //Linear Smoothing
     [SerializeField] private float rotationSpeed = 5f; // Spherical rotation Smoothing
 
-    public Player player;
+    [SerializeField] private Player player;
 
     public PlayerInputHandler InputHandler { get; private set; }
 
-    Transform myTransform;
+    private Transform myTransform;
 
+    private Transform TargetPos;
     private void Awake()
     {
         InputHandler = player.GetComponent<PlayerInputHandler>();
-        myTransform = transform;   
+        myTransform = transform;
+        TargetPos = target;
     }
 
     private void FixedUpdate()
@@ -43,9 +45,9 @@ public class SkeinMovement : MonoBehaviour
     private void Movement()
     {
         // Direction to be headed
-        Vector3 direction = MousePosition() - target.position;
+        Vector3 direction = MousePosition() - TargetPos.position;
         // Position to take
-        Vector3 toPos = target.position + (direction.normalized * offsetValue);
+        Vector3 toPos = TargetPos.position + (direction.normalized * offsetValue);
         // Smooth linear approach
         Vector3 curPos = Vector3.Lerp(myTransform.position, toPos, distDamp * Time.fixedDeltaTime);
         myTransform.position = curPos;
@@ -54,5 +56,18 @@ public class SkeinMovement : MonoBehaviour
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, rotationSpeed * Time.deltaTime);
+    }
+
+    private void LateUpdate()
+    {
+        TargetPos.position = target.position;    
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Danger"))
+        {
+            Destroy(gameObject);
+        }
     }
 }

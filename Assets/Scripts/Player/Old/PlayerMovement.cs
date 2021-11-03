@@ -19,8 +19,6 @@ public class PlayerMovement : MonoBehaviour
     // Bool variables to check jump, shield and move conditions
     bool jump = false;
     bool jumpRelease = false;
-    bool shieldIsOn = false;
-    bool ableToMove = true;
 
     #endregion
 
@@ -47,16 +45,16 @@ public class PlayerMovement : MonoBehaviour
     private void ShieldActivate()
     {
         // Shield activation function
-        shieldIsOn = true;
-        ableToMove = false;
+        /*shieldIsOn = true;
+        ableToMove = false;*/
        // shieldObject.SetActive(shieldIsOn);
     }
 
     private void ShieldDisactive()
     {
         // Shield disabling function
-        shieldIsOn = false;
-        ableToMove = true;
+       /* shieldIsOn = false;
+        ableToMove = true;*/
        // shieldObject.SetActive(shieldIsOn);
     }
 

@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Collectible
+  - Danger
   layers:
   - Default
   - TransparentFX
@@ -14,9 +16,9 @@ TagManager:
   - Ground
   - Background
   - Yarn
-  - 
-  - 
-  - 
+  - Impression
+  - Player
+  - Sputnik
   - 
   - 
   - 
@@ -44,9 +46,12 @@ TagManager:
   - name: Background
     uniqueID: 3318228009
     locked: 0
+  - name: Player
+    uniqueID: 2878511215
+    locked: 0
   - name: Platform
     uniqueID: 2400045467
     locked: 0
-  - name: Player
-    uniqueID: 2878511215
+  - name: Collectible
+    uniqueID: 1601657237
     locked: 0
