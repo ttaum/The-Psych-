@@ -22,6 +22,14 @@
                     "interactions": ""
                 },
                 {
+                    "name": "Crouch",
+                    "type": "Button",
+                    "id": "8f3212a1-49c7-4934-9cb2-3114c6a21d26",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
                     "name": "Interaction",
                     "type": "Button",
                     "id": "624cd36a-e0e8-4a13-8acd-5d6cee24d88b",
@@ -102,6 +110,17 @@
                     "processors": "",
                     "groups": "Keyboard",
                     "action": "Mouse",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f5de2024-58e2-4bc0-803a-35a20e870ff4",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Crouch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

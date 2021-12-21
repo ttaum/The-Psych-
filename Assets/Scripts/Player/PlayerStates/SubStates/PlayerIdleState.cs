@@ -29,16 +29,24 @@ public class PlayerIdleState : PlayerGroundedState
     {
         base.LogicUpdate();
 
-        if (input != 0)
+        if (movementInput != 0) // Условие перехода в состояние движения
         {
             stateMachine.ChangeState(player.MoveState);
         }
+        else if (crouchInput == 1)
+        {
+            stateMachine.ChangeState(player.CrouchIdleState);
+        }
+
     }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
 
-        player.SetRotation(player.CurrentAngleGr);
+        player.ApplyVelocity();
+
+        player.SetRotation(player.CurrentFloatEulerAngles);      
     }
 }
+

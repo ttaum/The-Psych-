@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerAbilityState : PlayerState
 {
-    protected bool isAbilityDone;
+    protected bool isAbilityDone; // Флаг о завершении состояния способности
 
     private bool isGrounded;
 
@@ -23,7 +23,7 @@ public class PlayerAbilityState : PlayerState
     {
         base.Enter();
 
-        isAbilityDone = false;
+        isAbilityDone = false; // При входе в состояние способности переключаем флаг в "ложно"
     }
 
     public override void Exit()
@@ -37,7 +37,7 @@ public class PlayerAbilityState : PlayerState
 
         if (isAbilityDone)
         {
-            if (isGrounded && player.LocalRbVelocity().y < 0.001f)
+            if (isGrounded && player.LocalRbVelocity().y < 0.01f)
             {
                 stateMachine.ChangeState(player.IdleState);
             }

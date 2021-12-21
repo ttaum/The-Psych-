@@ -5,25 +5,24 @@ using Cinemachine;
 
 public class Player : MonoBehaviour
 {
-    #region State Variables
+    #region State Variables 
+    // Выделяем память под инстансы состояний
     public PlayerStateMachine StateMachine { get; private set; }
-
     public PlayerIdleState IdleState { get; private set; }
-
     public PlayerMoveState MoveState { get; private set; }
-
     public PlayerJumpState JumpState { get; private set; }
-
     public PlayerInAirState InAirState { get; private set; }
-
     public PlayerLandState LandState { get; private set; }
+    public PlayerCrouchIdleState CrouchIdleState { get; private set; }
+    public PlayerCrouchMoveState CrouchMoveState { get; private set; }
 
     #endregion
 
     #region Components
-    public Animator Anim { get; private set; }
-    public PlayerInputHandler InputHandler { get; private set; }
+    public Animator Anim { get; private set; } // Выделяем память под аниматор
+    public PlayerInputHandler InputHandler { get; private set; } // Выделяем память под компонент ввода
     public Rigidbody2D RB { get; private set; }
+    public CapsuleCollider2D MovementCollider { get; private set; }
 
     #endregion
 
@@ -34,72 +33,84 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Transform groundCheck;
 
-    #endregion
-
-    #region Other variables
-
     [SerializeField]
     private PlayerData playerData;
 
     [SerializeField]
-    private CinemachineVirtualCamera vcam;
+    private Transform ceilingCheck;
 
-    private Vector3 refVelocity;
-    public Vector2 LocalVelocity { get; private set; }
+    // Раскоментить если нужно взаимодействие с камерой
+    /*[SerializeField]
+    private CinemachineVirtualCamera vcam;
+    */
+
+    #endregion
+
+    #region Other variables
+
+    private Vector2 workspace;
+
+    private Vector2 localVelocity; // Локальная скорость перемещения  
+    private Vector2 globalVelocity; // Глобальная скорость перемещения
+    private Vector3 refVelocity; // тех. значение для smoothDamp
+
+    private Vector2 globalJumpForce; // Глобальное значение для прыжка
 
     [Header("Smoothing and damping")]
 
-    [Range(0, .01f)] [SerializeField] private float movementSmoothing = .01f;
-    [Range(0, 5f)] [SerializeField] private float smoothDampCam = 1f;
+    [Range(0, .1f)] [SerializeField] private float movementSmoothing = .01f;
+    //  [Range(0, 5f)] [SerializeField] private float smoothDampCam = 1f;  Раскоментить для вращения камеры
     [Range(0, 25f)] [SerializeField] private float smoothDampRotation = 1f;
-
 
     [Header("Other")]
 
     [SerializeField] private LayerMask WhatIsYarn;
     [SerializeField] private float YarnCheckDistance;
-    [SerializeField] private VinylManager vinylManager;
 
     private bool facingRight = true;
 
-    public bool isAirForceAllowed;
-
- 
-
+    // public bool isAirForceAllowed; Для придания толчка в воздухе
 
     public Vector2 CurrentVector { get; private set; } = Vector2.down;
-    public Vector3 CurrentEuler { get; private set; }
 
-    private  Quaternion CurrentQuat;
-    public float CurrentAngleGr { get; private set; } = 0f;
-    public float CurrentAngleRad { get; private set; }
-    public float SmoothAngle { get; private set; } = 0f;
+    private Quaternion currentQuat;
+
+    private Vector3 currentVectorEulerAngles;
+    public float CurrentFloatEulerAngles { get; private set; }
+
+    private Vector2 gravityVector;
+ 
     #endregion
 
     #region Unity Callback Functions
 
     private void Awake()
     {
+        // Создаем инстанс машины состояний
         StateMachine = new PlayerStateMachine();
 
+        // Создаем инстасы состояний
         IdleState = new PlayerIdleState(this, StateMachine, playerData, "idle");
         MoveState = new PlayerMoveState(this, StateMachine, playerData, "move");
-        JumpState = new PlayerJumpState(this, StateMachine, playerData, "Jump");
+        JumpState = new PlayerJumpState(this, StateMachine, playerData, "inAir");
         InAirState = new PlayerInAirState(this, StateMachine, playerData, "inAir");
         LandState = new PlayerLandState(this, StateMachine, playerData, "land");
+        CrouchIdleState = new PlayerCrouchIdleState(this, StateMachine, playerData, "crouchIdle");
+        CrouchMoveState = new PlayerCrouchMoveState(this, StateMachine, playerData, "crouchMove");
 
-        vinylManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<VinylManager>();
     }
 
     private void Start()
     {
-        Anim = GetComponent<Animator>();
+        Anim = GetComponent<Animator>(); // Референсим компонент аниматор
 
-        InputHandler = GetComponent<PlayerInputHandler>();
+        InputHandler = GetComponent<PlayerInputHandler>(); // Референсим компонент ввода
 
         RB = GetComponent<Rigidbody2D>();
 
-        StateMachine.Initialize(IdleState);
+        MovementCollider = GetComponent<CapsuleCollider2D>();
+
+        StateMachine.Initialize(IdleState); // Инициализация машины состояний
     }
 
     private void Update()
@@ -115,56 +126,56 @@ public class Player : MonoBehaviour
     #endregion
 
     #region Set functions
-    public void SetVelocity(float input)
-    {
-        LocalVelocity = new Vector2(playerData.movementVelocity * input, 0f);
-        Vector2 velocity = transform.TransformDirection(LocalVelocity);
 
-        RB.velocity = Vector3.SmoothDamp(RB.velocity, velocity, ref refVelocity, movementSmoothing);
+    // Пересчет локальной скорости в глобальную (лог.)
+    public void SetVelocity(float movementInput)
+    {
+        localVelocity.Set(movementInput, 0f);    
+        globalVelocity = transform.TransformDirection(localVelocity);      
     }
 
-    public void SetJump()
+    // Смягченное изменение скорости (физ.)
+    public void ApplyVelocity()
     {
-        Vector2 localJumpForce = new Vector2(0, playerData.jumpForce);
-        Vector2 jumpForce = transform.TransformDirection(localJumpForce);
-
-        RB.AddForce(jumpForce, ForceMode2D.Impulse);      
+        RB.velocity = Vector3.SmoothDamp(RB.velocity, globalVelocity, ref refVelocity, movementSmoothing);
     }
 
-    public void SetAirForce(float input)
+    public void SetJump(float localJumpForce)
     {
-        Vector2 localAirForce = new Vector2(playerData.airForce * input, 0);
+        globalJumpForce = transform.TransformDirection(LocalRbVelocity().x, localJumpForce, 0f);
+
+        RB.velocity = globalJumpForce; // Через скорость
+       // RB.AddForce(globalJumpForce, ForceMode2D.Impulse); // Через силу
+    }
+
+    // Для придания толчка в воздухе
+
+    /*public void SetAirForce(float input) 
+    {
+        Vector2 localAirForce = new Vector2(playerData.airForce * input, 0); // мб переписать
         Vector2 AirForce = transform.TransformDirection(localAirForce);
 
         RB.AddForce(AirForce, ForceMode2D.Impulse);
-    }
+    }*/
 
     public Vector2 LocalRbVelocity()
     {
         return transform.InverseTransformDirection(RB.velocity);
     }
 
-    public void SetRotation(float CurrentAngleGr)
+    public void SetRotation(float currentAngleGr)
     {
+        currentVectorEulerAngles.Set(0f, 0f, currentAngleGr);
+
         // Euler -> quaternion
-        CurrentQuat.eulerAngles = new Vector3(0f, 0f, CurrentAngleGr);
+        currentQuat.eulerAngles = currentVectorEulerAngles;
 
         // rotate Player
-        if(Quaternion.Angle(transform.rotation, CurrentQuat) > .5f)
+        if(Quaternion.Angle(transform.rotation, currentQuat) > .05f)
         {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, CurrentQuat, smoothDampRotation);
-        }
-            
-        // Rotate camera
-        if(Mathf.Abs(SmoothAngle - CurrentAngleGr) > .05f)
-        {
-            SmoothAngle = Mathf.LerpAngle(SmoothAngle, CurrentAngleGr, smoothDampCam * Time.fixedDeltaTime);
-            vcam.m_Lens.Dutch = SmoothAngle;
-        }
-
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, currentQuat, smoothDampRotation);
+        }         
     }
-
-
 
     #endregion
 
@@ -176,24 +187,25 @@ public class Player : MonoBehaviour
 
         // If raycast hits Yarn layer -> estimate angle between hit normal and CurrentVector to define
         // the angle to rotate character/gravity/horizontalInput/jumpForce direction.
+
         if (hit)
         {
-            CurrentAngleGr = -Vector2.SignedAngle(hit.normal, Vector2.up);      
+            CurrentFloatEulerAngles = -Vector2.SignedAngle(hit.normal, Vector2.up);      
                          
             // Define new direction for RaycastHit
             CurrentVector = -hit.normal;
 
-           // CurrentAngleRad = CurrentAngleGr * Mathf.PI / 180; hz vrode ne nado
+            SetRotation(CurrentFloatEulerAngles);
 
-            SetRotation(CurrentAngleGr);
+            gravityVector.Set(CurrentVector.x * 9.8f, CurrentVector.y * 9.8f);
 
-            Physics2D.gravity = new Vector2(CurrentVector.x, CurrentVector.y) * 9.8f;
+            // Physics2D.gravity = new Vector2(CurrentVector.x, CurrentVector.y) * 9.8f;
+            Physics2D.gravity = gravityVector;
 
             Debug.DrawRay(hit.point, hit.normal, Color.green);
         }
-
-
     }
+
     public void CheckIfFlip(float input)
     {
         if (input > 0 && !facingRight)
@@ -214,19 +226,30 @@ public class Player : MonoBehaviour
         return Physics2D.OverlapCircle(groundCheck.position, playerData.groundCheckRadius, playerData.whatIsGround);
     }
 
-    public void CheckIfAirForce(bool check)
+    public bool CheckForCeiling()
     {
-        isAirForceAllowed = check;
+        return Physics2D.OverlapCircle(ceilingCheck.position, playerData.groundCheckRadius, playerData.whatIsGround);
     }
+
+    // Для придания толчка в воздухе
+
+    /*public void CheckIfAirForce(bool check) => isAirForceAllowed = check;*/
 
     #endregion
 
     #region Other functions
 
-    private void AnimationTrigger() => StateMachine.CurrentState.AnimationTrigger();
+    public void SetColliderHeight(float height)
+    {
+        Vector2 center = MovementCollider.offset;
+        workspace.Set(MovementCollider.size.x, height);
 
-    private void AnimationFinishedTrigger() => StateMachine.CurrentState.AnimationFinishTrigger();
+        center.y += (height - MovementCollider.size.y) / 2;
 
+        MovementCollider.size = workspace;
+        MovementCollider.offset = center;
+    }
+    
     private void Flip()
     {
         // Switch the way the player is labelled as facing.
@@ -238,13 +261,9 @@ public class Player : MonoBehaviour
         transform.localScale = theScale;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Collectible"))
-        {
-            Destroy(collision.gameObject);
-            vinylManager.currentYarnCharges = vinylManager.maxYarnCharges;
-        }
-    }
+    private void AnimationTrigger() => StateMachine.CurrentState.AnimationTrigger();
+
+    private void AnimationFinishedTrigger() => StateMachine.CurrentState.AnimationFinishTrigger();
+
     #endregion
 }

@@ -12,10 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61bc12f94bdfce04cb0c3c029123db91, type: 3}
   m_Name: PlayerData
   m_EditorClassIdentifier: 
-  movementVelocity: 15
-  jumpForce: 1000
-  airForce: 200
-  groundCheckRadius: 0.3
+  movementVelocity: 20
+  jumpForce: 20
+  amountOfJumps: 2
+  variableJumpHeightMultiplier: 0.5
+  crouchMovementVelocity: 15
+  crouchColliderHeight: 1
+  standColliderHeight: 2
+  groundCheckRadius: 0.1
   whatIsGround:
     serializedVersion: 2
     m_Bits: 320

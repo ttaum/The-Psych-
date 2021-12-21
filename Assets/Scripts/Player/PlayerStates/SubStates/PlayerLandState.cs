@@ -17,7 +17,7 @@ public class PlayerLandState : PlayerGroundedState
     {
         base.LogicUpdate();
 
-        if (input != 0 && (stateMachine.CurrentState != player.JumpState))
+        if (movementInput != 0 && (stateMachine.CurrentState != player.JumpState))
         {
             stateMachine.ChangeState(player.MoveState);
         }

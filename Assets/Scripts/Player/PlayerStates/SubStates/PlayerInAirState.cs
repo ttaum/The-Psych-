@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class PlayerInAirState : PlayerState
 {
-    private float input;
+    // private float movementInput; Для придания толчка в воздухе
     private bool isGrounded;
+    private bool jumpInput;
+    private bool jumpInputStop;
+    private bool isJumping;
     
     public PlayerInAirState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
@@ -22,7 +25,7 @@ public class PlayerInAirState : PlayerState
     {
         base.Enter();
 
-        player.isAirForceAllowed = true;
+        // player.isAirForceAllowed = true; Для придания толчка в воздухе
     }
 
     public override void Exit()
@@ -34,23 +37,49 @@ public class PlayerInAirState : PlayerState
     {
         base.LogicUpdate();
 
-        input = player.InputHandler.MovementInput;
+        // movementInput = player.InputHandler.MovementInput; Для придания толчка в воздухе
+        jumpInput = player.InputHandler.JumpInput;
+        jumpInputStop = player.InputHandler.JumpInputStop;
 
-        if (isGrounded && player.LocalRbVelocity().y < 0.01f)
+        CheckJumpMultiplier();
+
+        if (isGrounded && player.LocalRbVelocity().y < 0.01f) // Условия перехода в состояние приземления = на земле + скорость меньше 0.01f
         {
             stateMachine.ChangeState(player.LandState);
         }
+        else if (jumpInput && player.JumpState.CanJump())
+        {
+            player.InputHandler.UseJumpInput();
+            stateMachine.ChangeState(player.JumpState);
+        }
         else
         {
-            player.Anim.SetFloat("yVelocity", player.LocalRbVelocity().y);
+            player.Anim.SetFloat("yVelocity", player.LocalRbVelocity().y); // Передача значения вертикальной скорости аниматору
 
-            if (player.isAirForceAllowed && input != 0)
+            // Придание толчка в воздухе
+
+            /*if (player.isAirForceAllowed && movementInput != 0)
             {
-                player.SetAirForce(input);
+                player.SetAirForce(movementInput);
                 player.isAirForceAllowed = false;
+            }*/
+        }
+    }
+
+    private void CheckJumpMultiplier() // Применяем множитель к прыжку если отжат пробел
+    {
+        if (isJumping)
+        {
+            if (jumpInputStop)
+            {
+                player.SetJump(player.LocalRbVelocity().y * playerData.variableJumpHeightMultiplier);
+                isJumping = false;
+            }
+            else if (player.LocalRbVelocity().y <= 0f)
+            {
+                isJumping = false;
             }
         }
-
     }
 
     public override void PhysicsUpdate()
@@ -59,4 +88,6 @@ public class PlayerInAirState : PlayerState
 
         player.CheckYarn();
     }
+
+    public void SetIsJumping() => isJumping = true;
 }

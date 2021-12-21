@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class PlayerGroundedState : PlayerState
 {
+    protected float movementInput; // Память для ввода движения
 
-    protected float input;
+    protected bool isTouchingCeiling;
 
-    private bool jumpInput;
+    private bool jumpInput; // Память для ввода прыжка
+
+
+    protected int crouchInput; 
 
     private bool isGrounded;
 
@@ -20,11 +24,14 @@ public class PlayerGroundedState : PlayerState
         base.DoChecks();
 
         isGrounded = player.CheckIfGrounded();
+        isTouchingCeiling = player.CheckForCeiling();
     }
 
     public override void Enter()
     {
         base.Enter();
+
+        player.JumpState.ResetAmountOfJumpsLeft(); // Обновляем количество прыжков
     }
 
     public override void Exit()
@@ -36,10 +43,13 @@ public class PlayerGroundedState : PlayerState
     {
         base.LogicUpdate();
 
-        input = player.InputHandler.MovementInput;
+        movementInput = player.InputHandler.MovementInput; // Читаем ввод движения из Player
+
         jumpInput = player.InputHandler.JumpInput;
 
-        if (jumpInput)
+        crouchInput = player.InputHandler.CrouchInput;
+
+        if (jumpInput && player.JumpState.CanJump())
         {
             player.InputHandler.UseJumpInput();
             stateMachine.ChangeState(player.JumpState);
@@ -47,6 +57,7 @@ public class PlayerGroundedState : PlayerState
 
         if (!isGrounded)
         {
+            player.JumpState.DecreaseAmountOfJumpsLeft();
             stateMachine.ChangeState(player.InAirState);
         }
     }

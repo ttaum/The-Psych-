@@ -26,9 +26,9 @@ public class PlayerMovement : MonoBehaviour
     {
         // Define input actions
         controls = new PlayerInputActions();
-        controls.Gameplay.Movement.performed += ctx => horizontalMove = ctx.ReadValue<float>();
-        controls.Gameplay.Jump.started += ctx => jump = true;
-        controls.Gameplay.Jump.canceled += ctx => jumpRelease = true;
+     //   controls.Gameplay.Movement.performed += ctx => horizontalMove = ctx.ReadValue<float>();
+      //  controls.Gameplay.Jump.started += ctx => jump = true;
+       // controls.Gameplay.Jump.canceled += ctx => jumpRelease = true;
         // controls.Player.Shield.started += ctx => ShieldActivate();
         // controls.Player.Shield.canceled += ctx => ShieldDisactive();
     }

@@ -2,21 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerState 
+public class PlayerState  // Базовый класс для состояний игрока
 {
 
     protected Player player;
+    
+    // protected = private, однако наследники имеют доступ к переменной 
+
     protected PlayerStateMachine stateMachine;
+
     protected PlayerData playerData;
 
-    protected bool isAnimationFinished;
+    protected bool isAnimationFinished; // Переменная для флага конца анимации
 
-    protected float startTime;
+    protected float startTime; // Сюда запишем время когда зашли в состояние
 
-    private string animBoolName;
+    private string animBoolName; // Название анимации для аниматора
 
-
-    public PlayerState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName)
+    public PlayerState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) 
+        // Конструктор для инстанса состояния
     {
         this.player = player;
         this.stateMachine = stateMachine;
@@ -24,7 +28,7 @@ public class PlayerState
         this.animBoolName = animBoolName;
     }
 
-    public virtual void Enter()
+    public virtual void Enter() // Функция выполняется при вхождении в состояние
     {
         DoChecks();
         player.Anim.SetBool(animBoolName, true);
@@ -33,22 +37,22 @@ public class PlayerState
         isAnimationFinished = false;
     }
 
-    public virtual void Exit()
+    public virtual void Exit() // Функция выполняется при выходе из состояние
     {
         player.Anim.SetBool(animBoolName, false);
     }
 
-    public virtual void LogicUpdate()
+    public virtual void LogicUpdate() // Выполняется каждый фрейм
     {
 
     }
 
-    public virtual void PhysicsUpdate()
+    public virtual void PhysicsUpdate() // Выполняется каждый fixedupdate
     {
         DoChecks();
     }
 
-    public virtual void DoChecks()
+    public virtual void DoChecks() // Выполняем все проверки
     {
 
     }

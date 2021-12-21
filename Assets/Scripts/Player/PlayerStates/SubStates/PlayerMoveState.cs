@@ -25,28 +25,29 @@ public class PlayerMoveState : PlayerGroundedState
     }
 
     public override void LogicUpdate()
-    {
-        
-        //player.SetVelocity(input);
-
+    { 
         base.LogicUpdate();
 
-        player.CheckIfFlip(input);
+        player.SetVelocity(movementInput * playerData.movementVelocity);
+
+        player.CheckIfFlip(movementInput);
        
-        if (input == 0)
+        if (movementInput == 0) // Условие перехода в состояние бездействия
         {
             stateMachine.ChangeState(player.IdleState);
         }
-
+        else if (crouchInput == 1)
+        {
+            stateMachine.ChangeState(player.CrouchMoveState);
+        }
     }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
 
-        player.SetVelocity(input);
+        player.ApplyVelocity();
 
         player.CheckYarn();
-
     }
 }
