@@ -37,19 +37,13 @@ public class PlayerIdleState : PlayerGroundedState
         {
             stateMachine.ChangeState(player.CrouchIdleState);
         }
-        else if (ShiftInput && isGrounded)
-        {
-            stateMachine.ChangeState(player.SpiritState);
-        }
     }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
 
-        player.ApplyVelocity();
-
-        player.SetRotation(player.CurrentFloatEulerAngles);      
+        player.ApplyVelocity();     
     }
 }
 

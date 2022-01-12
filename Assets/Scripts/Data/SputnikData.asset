@@ -12,4 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b26c12b0dfe0ecb429460e7dae893f27, type: 3}
   m_Name: SputnikData
   m_EditorClassIdentifier: 
-  movementVelocity: 10
+  bindOffsetValue: 3
+  bindMovememtDamp: 30
+  bindRotationDamp: 10
+  freeOffsetValue: 2
+  freeMovementDamp: 2
+  freeRotationDamp: 5

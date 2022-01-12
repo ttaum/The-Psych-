@@ -1,4 +1,4 @@
-using System.Collections;
+    using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,8 +7,6 @@ public class PlayerSpiritState : State
     public PlayerSpiritState(Player player, StateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
     }
-
-    private bool ShiftInput;
 
     private bool isGrounded;
 
@@ -21,11 +19,9 @@ public class PlayerSpiritState : State
 
     public override void Enter()
     {
-        base.Enter();
-
+        DoChecks();
+        player.Anim.speed = 0f;
         player.particleToSputnik.Play();
-
-        player.SetVelocity(0f);
     }
 
     public override void Exit()
@@ -37,11 +33,23 @@ public class PlayerSpiritState : State
     {
         base.LogicUpdate();
 
-        ShiftInput = player.InputHandler.ShiftInput;
+        float distance = (player.sputnikPosition.position -
+            player.transform.position).magnitude;
 
-        if (!ShiftInput)
+        if (ShiftInput && distance < player.SpiritEnterRadius) // Выходим из состояния духа если находимся близко
         {
-            stateMachine.ChangeState(player.IdleState);
+            player.InputHandler.UseShiftInput();
+
+            player.Anim.speed = 1f; // Продолжаем анимации
+
+            player.RB.constraints = RigidbodyConstraints2D.None;
+            player.RB.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+            stateMachine.ChangeState(previousState);
+        }
+        else
+        {
+            player.InputHandler.UseShiftInput();
         }
     }
 
@@ -49,8 +57,6 @@ public class PlayerSpiritState : State
     {
         base.PhysicsUpdate();
 
-        player.ApplyVelocity();
-
-        player.SetRotation(player.CurrentFloatEulerAngles);
+        player.CheckYarn();
     }
 }

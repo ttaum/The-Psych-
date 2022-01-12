@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class Sputnik : MonoBehaviour
 
@@ -8,8 +9,10 @@ public class Sputnik : MonoBehaviour
     #region State Variables 
     // Выделяем память под инстансы состояний
     public SputnikStateMachine SputnikStateMachine { get; private set; }
-    public SputnikBindState BindState { get; private set; }
+    public SputnikIdleState IdleState { get; private set; }
     public SputnikFreeState FreeState { get; private set; }
+    public SputnikAttackState AttackState { get; private set; }
+    public SputnikDefenseState DefenseState { get; private set; }
     #endregion
 
     #region Components
@@ -21,6 +24,10 @@ public class Sputnik : MonoBehaviour
 
     #region Objects
     [Header("Objects")]
+
+    [SerializeField]
+    public Player player;
+
     [SerializeField] 
     private GameObject input; // Input reference
 
@@ -29,6 +36,12 @@ public class Sputnik : MonoBehaviour
 
     [SerializeField]
     private SputnikData sputnikData;
+
+    [SerializeField]
+    public GameObject playerVcam;
+
+    [SerializeField]
+    public GameObject sputnikVcam;
 
     #endregion
 
@@ -42,9 +55,10 @@ public class Sputnik : MonoBehaviour
         // Создаем инстанс машины состояний
         SputnikStateMachine = new SputnikStateMachine();
 
-        BindState = new SputnikBindState(this, SputnikStateMachine, sputnikData, "bind");
+        IdleState = new SputnikIdleState(this, SputnikStateMachine, sputnikData, "idle");
         FreeState = new SputnikFreeState(this, SputnikStateMachine, sputnikData, "free");
-
+        AttackState = new SputnikAttackState(this, SputnikStateMachine, sputnikData, "attack");
+        DefenseState = new SputnikDefenseState(this, SputnikStateMachine, sputnikData, "defense");
     }
 
     private void Start()
@@ -53,8 +67,7 @@ public class Sputnik : MonoBehaviour
 
         InputHandler = input.GetComponent<PlayerInputHandler>();
 
-        SputnikStateMachine.Initialize(BindState);
-
+        SputnikStateMachine.Initialize(IdleState);
     }
 
     private void Update()
@@ -70,6 +83,8 @@ public class Sputnik : MonoBehaviour
 
     #endregion
 
+    #region Functions
+
     public Vector3 MousePosition() //Follow-point calculation
     {
         // Define main plane 
@@ -84,7 +99,31 @@ public class Sputnik : MonoBehaviour
         return Vector3.zero;
     }
 
-    public void BindMovement()
+    public void FreeMovement() // Movement in free state
+    {
+        Vector3 toPos = new Vector3(transform.position.x, transform.position.y);
+
+        Vector3 direction = MousePosition() - transform.position;
+
+        if ((direction).magnitude > sputnikData.freeOffsetValue)
+        {
+            toPos = MousePosition() - direction.normalized * sputnikData.freeOffsetValue;
+
+            Vector3 curPos = Vector3.Lerp(transform.position, toPos,
+                sputnikData.freeMovementDamp * Time.fixedDeltaTime);
+            transform.position = curPos;
+        }
+
+        // Alligning X local axis with direction
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+        // Smooth approach
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation,
+            sputnikData.freeRotationDamp * Time.deltaTime);
+    } 
+
+    public void BindMovement() // Movement in binded state
     {
         Vector3 toPos = new Vector3(transform.position.x, transform.position.y);
 
@@ -92,9 +131,9 @@ public class Sputnik : MonoBehaviour
         Vector3 direction = MousePosition() - rotationCentre.position;
 
         // Position to take
-        if ((direction).magnitude > sputnikData.offsetValue)
+        if ((direction).magnitude > sputnikData.bindOffsetValue)
         {
-            toPos = rotationCentre.position + (direction.normalized * sputnikData.offsetValue);
+            toPos = rotationCentre.position + direction.normalized * sputnikData.bindOffsetValue;
         }
         else
         {
@@ -103,7 +142,7 @@ public class Sputnik : MonoBehaviour
 
         // Smooth approach
         Vector3 curPos = Vector3.Lerp(transform.position, toPos,
-            sputnikData.movememtDamp * Time.fixedDeltaTime);
+            sputnikData.bindMovememtDamp * Time.fixedDeltaTime);
         transform.position = curPos;
 
         // Alligning X local axis with direction
@@ -112,6 +151,8 @@ public class Sputnik : MonoBehaviour
 
         // Smooth approach
         transform.rotation = Quaternion.Slerp(transform.rotation, rotation,
-            sputnikData.rotationDamp * Time.deltaTime);
-    }
+            sputnikData.bindRotationDamp * Time.deltaTime);
+    } 
+
+    #endregion
 }

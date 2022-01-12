@@ -73,6 +73,22 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""8f684789-8d93-4fe4-8df3-71bbc3aa01f4"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Defense"",
+                    ""type"": ""Button"",
+                    ""id"": ""4b595448-2e65-45c1-9b08-db796c1df9b5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -218,6 +234,28 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                     ""action"": ""Shift"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""db435e6f-3185-4a57-8214-bf656f99203b"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b9f430d8-c8ba-4da2-986a-a1babadf54b1"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Defense"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -250,6 +288,8 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
         m_Gameplay_Mouse = m_Gameplay.FindAction("Mouse", throwIfNotFound: true);
         m_Gameplay_Shift = m_Gameplay.FindAction("Shift", throwIfNotFound: true);
         m_Gameplay_SputnikMovement = m_Gameplay.FindAction("SputnikMovement", throwIfNotFound: true);
+        m_Gameplay_Attack = m_Gameplay.FindAction("Attack", throwIfNotFound: true);
+        m_Gameplay_Defense = m_Gameplay.FindAction("Defense", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -306,6 +346,8 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
     private readonly InputAction m_Gameplay_Mouse;
     private readonly InputAction m_Gameplay_Shift;
     private readonly InputAction m_Gameplay_SputnikMovement;
+    private readonly InputAction m_Gameplay_Attack;
+    private readonly InputAction m_Gameplay_Defense;
     public struct GameplayActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -317,6 +359,8 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
         public InputAction @Mouse => m_Wrapper.m_Gameplay_Mouse;
         public InputAction @Shift => m_Wrapper.m_Gameplay_Shift;
         public InputAction @SputnikMovement => m_Wrapper.m_Gameplay_SputnikMovement;
+        public InputAction @Attack => m_Wrapper.m_Gameplay_Attack;
+        public InputAction @Defense => m_Wrapper.m_Gameplay_Defense;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -347,6 +391,12 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 @SputnikMovement.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnSputnikMovement;
                 @SputnikMovement.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnSputnikMovement;
                 @SputnikMovement.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnSputnikMovement;
+                @Attack.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnAttack;
+                @Attack.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnAttack;
+                @Attack.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnAttack;
+                @Defense.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnDefense;
+                @Defense.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnDefense;
+                @Defense.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnDefense;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -372,6 +422,12 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 @SputnikMovement.started += instance.OnSputnikMovement;
                 @SputnikMovement.performed += instance.OnSputnikMovement;
                 @SputnikMovement.canceled += instance.OnSputnikMovement;
+                @Attack.started += instance.OnAttack;
+                @Attack.performed += instance.OnAttack;
+                @Attack.canceled += instance.OnAttack;
+                @Defense.started += instance.OnDefense;
+                @Defense.performed += instance.OnDefense;
+                @Defense.canceled += instance.OnDefense;
             }
         }
     }
@@ -394,5 +450,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
         void OnMouse(InputAction.CallbackContext context);
         void OnShift(InputAction.CallbackContext context);
         void OnSputnikMovement(InputAction.CallbackContext context);
+        void OnAttack(InputAction.CallbackContext context);
+        void OnDefense(InputAction.CallbackContext context);
     }
 }

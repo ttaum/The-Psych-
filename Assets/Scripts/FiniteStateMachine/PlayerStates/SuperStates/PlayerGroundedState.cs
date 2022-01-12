@@ -10,13 +10,12 @@ public class PlayerGroundedState : State
 
     private bool jumpInput; // Память для ввода прыжка
 
-    protected bool ShiftInput;
-
     protected int crouchInput; 
 
     protected bool isGrounded;
 
-    public PlayerGroundedState(Player player, StateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
+    public PlayerGroundedState(Player player, StateMachine stateMachine, PlayerData playerData, string animBoolName) :
+        base(player, stateMachine, playerData, animBoolName)
     {
     }
 
@@ -48,8 +47,6 @@ public class PlayerGroundedState : State
 
         jumpInput = player.InputHandler.JumpInput;
 
-        ShiftInput = player.InputHandler.ShiftInput;
-
         crouchInput = player.InputHandler.CrouchInput;
 
         if (jumpInput && player.JumpState.CanJump())
@@ -68,5 +65,7 @@ public class PlayerGroundedState : State
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
+
+        player.CheckYarn();
     }
 }

@@ -16,6 +16,7 @@ MonoBehaviour:
   jumpForce: 20
   amountOfJumps: 2
   variableJumpHeightMultiplier: 0.5
+  airForce: 20
   crouchMovementVelocity: 15
   crouchColliderHeight: 1
   standColliderHeight: 2

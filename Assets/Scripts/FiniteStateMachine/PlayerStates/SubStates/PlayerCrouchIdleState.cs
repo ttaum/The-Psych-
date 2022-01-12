@@ -8,7 +8,6 @@ public class PlayerCrouchIdleState : PlayerGroundedState
     {
     }
 
-
     public override void Enter()
     {
         base.Enter();

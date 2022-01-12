@@ -11,6 +11,8 @@ public class PlayerInputHandler : MonoBehaviour
     public int CrouchInput { get; private set; } // Переменная для записи ввода приседания
     public Vector2 MouseInput { get; private set; } // Переменная для записи ввода координат указателя мышки
     public bool ShiftInput { get; private set; } // Переменная для записи состояния сдвига
+    public int AttackInput { get; private set; } // Переменная для перехода в состояние атаки
+    public int DefenseInput { get; private set; } // Переменная для перехода в состояние защиты
 
     [SerializeField]
     private float inputHoldTime = 0.2f; // Время которое ввод прыжка "истина" после нажатия
@@ -39,7 +41,7 @@ public class PlayerInputHandler : MonoBehaviour
             JumpInputStop = false;
             jumpInputStartTime = Time.time;
         }
-        if (context.canceled)
+        else if(context.canceled)
         {
             JumpInputStop = true;
         }
@@ -47,9 +49,11 @@ public class PlayerInputHandler : MonoBehaviour
 
     public void UseJumpInput() => JumpInput = false;
 
+    public void UseShiftInput() => ShiftInput = false;
+
     private void CheckJumpInputHoldTime() // Таймер после которого ввод прыжка становится "ложь" (используется для более приятного геймплея)
     {
-        if(Time.time >= jumpInputStartTime + inputHoldTime)
+        if (Time.time >= jumpInputStartTime + inputHoldTime)
         {
             JumpInput = false;
         }
@@ -61,8 +65,7 @@ public class PlayerInputHandler : MonoBehaviour
         {
             CrouchInput = 1;
         }
-
-        if (context.canceled)
+        else if(context.canceled)
         {
             CrouchInput = 0;
         }
@@ -75,4 +78,29 @@ public class PlayerInputHandler : MonoBehaviour
             ShiftInput = !ShiftInput;
         }
     }
+
+    public void OnAttackInput(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            AttackInput = 1;
+        }
+        else if (context.canceled)
+        {
+            AttackInput = 0;
+        }
+
+    }
+    public void OnDefenseInput(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            DefenseInput = 1;
+        }
+        else if (context.canceled)
+        {
+            DefenseInput = 0;
+        }
+    }
 }
+

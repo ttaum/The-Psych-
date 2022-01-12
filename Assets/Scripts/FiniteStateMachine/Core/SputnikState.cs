@@ -24,7 +24,7 @@ public class SputnikState // Базовый класс для состояний спутника
     {
         DoChecks();
         sputnik.Anim.SetBool(animBoolName, true); 
-        Debug.Log(animBoolName);
+        Debug.Log("Sputnik " + animBoolName);
     }
     public virtual void Exit() // Функция выполняется при выходе из состояние
     {
@@ -33,7 +33,7 @@ public class SputnikState // Базовый класс для состояний спутника
 
     public virtual void LogicUpdate() // Выполняется каждый фрейм
     {
-
+        
     }
 
     public virtual void PhysicsUpdate() // Выполняется каждый fixedupdate

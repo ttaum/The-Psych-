@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SputnikStateMachine : MonoBehaviour
+public class SputnikStateMachine
 {
     public SputnikState CurrentState { get; private set; }
 

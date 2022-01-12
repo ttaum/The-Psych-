@@ -40,10 +40,6 @@ public class PlayerMoveState : PlayerGroundedState
         {
             stateMachine.ChangeState(player.CrouchMoveState);
         }
-        else if (ShiftInput && isGrounded)
-        {
-            stateMachine.ChangeState(player.SpiritState);
-        }
     }
 
     public override void PhysicsUpdate()
@@ -51,7 +47,5 @@ public class PlayerMoveState : PlayerGroundedState
         base.PhysicsUpdate();
 
         player.ApplyVelocity();
-
-        player.CheckYarn();
     }
 }

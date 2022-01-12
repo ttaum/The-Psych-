@@ -25,10 +25,10 @@ public class PlayerLandState : PlayerGroundedState
         {
             stateMachine.ChangeState(player.IdleState);
         }
-        else if (ShiftInput && isGrounded)
+        /*else if (ShiftInput && isGrounded)
         {
             stateMachine.ChangeState(player.SpiritState);
-        }
+        }*/
     }
 
     public override void PhysicsUpdate()

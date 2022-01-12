@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerInAirState : State
 {
-    // private float movementInput; Для придания толчка в воздухе
+    private float movementInput; // Для придания толчка в воздухе
     private bool isGrounded;
     private bool jumpInput;
     private bool jumpInputStop;
@@ -25,7 +25,7 @@ public class PlayerInAirState : State
     {
         base.Enter();
 
-        // player.isAirForceAllowed = true; Для придания толчка в воздухе
+         player.isAirForceAllowed = true; //Для придания толчка в воздухе
     }
 
     public override void Exit()
@@ -37,7 +37,8 @@ public class PlayerInAirState : State
     {
         base.LogicUpdate();
 
-        // movementInput = player.InputHandler.MovementInput; Для придания толчка в воздухе
+        movementInput = player.InputHandler.MovementInput; //Для придания толчка в воздухе
+
         jumpInput = player.InputHandler.JumpInput;
 
         jumpInputStop = player.InputHandler.JumpInputStop;
@@ -59,11 +60,11 @@ public class PlayerInAirState : State
 
             // Придание толчка в воздухе
 
-            /*if (player.isAirForceAllowed && movementInput != 0)
+            if (player.isAirForceAllowed && movementInput != 0)
             {
                 player.SetAirForce(movementInput);
                 player.isAirForceAllowed = false;
-            }*/
+            }
         }
     }
 

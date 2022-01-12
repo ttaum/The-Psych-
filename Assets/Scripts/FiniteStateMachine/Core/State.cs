@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class State  // Базовый класс для состояний игрока
 {
+    public State previousState; // Для записи предыдущего состояния
 
     protected Player player;
     
@@ -12,6 +13,8 @@ public class State  // Базовый класс для состояний игрока
     protected StateMachine stateMachine;
 
     protected PlayerData playerData;
+
+    protected bool ShiftInput;
 
     protected bool isAnimationFinished; // Переменная для флага конца анимации
 
@@ -31,20 +34,36 @@ public class State  // Базовый класс для состояний игрока
     public virtual void Enter() // Функция выполняется при вхождении в состояние
     {
         DoChecks();
-        player.Anim.SetBool(animBoolName, true);
+        if(previousState != null && previousState != player.SpiritState)
+        {
+            player.Anim.SetBool(previousState.animBoolName, false);
+        } 
         startTime = Time.time;
-        //Debug.Log(animBoolName);
+        Debug.Log("Player " + animBoolName);
+        player.Anim.SetBool(animBoolName, true);
         isAnimationFinished = false;
     }
 
-    public virtual void Exit() // Функция выполняется при выходе из состояние
+    public virtual void Exit() // Функция выполняется при выходе из состояния
     {
-        player.Anim.SetBool(animBoolName, false);
+        if(player.StateMachine.CurrentState == player.SpiritState)
+        {
+            player.Anim.SetBool(previousState.animBoolName, false);
+        }
     }
 
     public virtual void LogicUpdate() // Выполняется каждый фрейм
     {
+        ShiftInput = player.InputHandler.ShiftInput;
 
+        if (ShiftInput && player.StateMachine.CurrentState != player.SpiritState) //Входим в состояние духа
+        {
+            player.InputHandler.UseShiftInput();
+
+            player.RB.constraints = RigidbodyConstraints2D.FreezePosition;
+
+            stateMachine.ChangeState(player.SpiritState);
+        }
     }
 
     public virtual void PhysicsUpdate() // Выполняется каждый fixedupdate
@@ -60,7 +79,6 @@ public class State  // Базовый класс для состояний игрока
     public virtual void AnimationTrigger() { }
 
     public virtual void AnimationFinishTrigger() => isAnimationFinished = true;
-
 
 }
 

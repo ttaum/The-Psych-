@@ -46,12 +46,18 @@ TagManager:
   - name: Background
     uniqueID: 3318228009
     locked: 0
+  - name: Wallground
+    uniqueID: 2409623529
+    locked: 0
   - name: Player
     uniqueID: 2878511215
+    locked: 0
+  - name: Collectible
+    uniqueID: 1601657237
     locked: 0
   - name: Platform
     uniqueID: 2400045467
     locked: 0
-  - name: Collectible
-    uniqueID: 1601657237
+  - name: Foreground
+    uniqueID: 1849880285
     locked: 0

@@ -46,27 +46,22 @@ public class Player : MonoBehaviour
     [SerializeField]
     public ParticleSystem particleToSputnik;
 
-    // Раскоментить если нужно взаимодействие с камерой
-    /*[SerializeField]
-    private CinemachineVirtualCamera vcam;
-    */
+    [SerializeField]
+    public Transform sputnikPosition;
 
     #endregion
 
     #region Other variables
 
     private Vector2 workspace;
-
     private Vector2 localVelocity; // Локальная скорость перемещения  
     private Vector2 globalVelocity; // Глобальная скорость перемещения
     private Vector3 refVelocity; // тех. значение для smoothDamp
-
     private Vector2 globalJumpForce; // Глобальное значение для прыжка
 
     [Header("Smoothing and damping")]
 
     [Range(0, .2f)] [SerializeField] private float movementSmoothing = .01f;
-    //  [Range(0, 5f)] [SerializeField] private float smoothDampCam = 1f;  Раскоментить для вращения камеры
     [Range(0, 25f)] [SerializeField] private float smoothDampRotation = 1f;
 
     [Header("Other")]
@@ -76,7 +71,7 @@ public class Player : MonoBehaviour
 
     private bool facingRight = true;
 
-    // public bool isAirForceAllowed; Для придания толчка в воздухе
+    public bool isAirForceAllowed; // Для придания толчка в воздухе
 
     public Vector2 CurrentVector { get; private set; } = Vector2.down;
 
@@ -86,6 +81,8 @@ public class Player : MonoBehaviour
     public float CurrentFloatEulerAngles { get; private set; }
 
     private Vector2 gravityVector;
+
+    public float SpiritEnterRadius { get; private set; } = 5.0f;
  
     #endregion
 
@@ -118,6 +115,7 @@ public class Player : MonoBehaviour
         MovementCollider = GetComponent<CapsuleCollider2D>();
 
         StateMachine.Initialize(IdleState); // Инициализация машины состояний
+
     }
 
     private void Update()
@@ -155,17 +153,15 @@ public class Player : MonoBehaviour
        // RB.AddForce(globalJumpForce, ForceMode2D.Impulse); // Через силу
     }
 
-
-
     // Для придания толчка в воздухе
 
-    /*public void SetAirForce(float input) 
+    public void SetAirForce(float input) 
     {
         Vector2 localAirForce = new Vector2(playerData.airForce * input, 0); // мб переписать
         Vector2 AirForce = transform.TransformDirection(localAirForce);
 
         RB.AddForce(AirForce, ForceMode2D.Impulse);
-    }*/
+    }
 
     public Vector2 LocalRbVelocity()
     {
@@ -242,7 +238,7 @@ public class Player : MonoBehaviour
 
     // Для придания толчка в воздухе
 
-    /*public void CheckIfAirForce(bool check) => isAirForceAllowed = check;*/
+    public void CheckIfAirForce(bool check) => isAirForceAllowed = check;
 
     #endregion
 
@@ -273,6 +269,14 @@ public class Player : MonoBehaviour
     private void AnimationTrigger() => StateMachine.CurrentState.AnimationTrigger();
 
     private void AnimationFinishedTrigger() => StateMachine.CurrentState.AnimationFinishTrigger();
+
+    #endregion
+
+    #region Editor
+    private void OnDrawGizmos() // Радиус сцепки со спутником
+    {
+        Gizmos.DrawWireSphere(transform.position, SpiritEnterRadius);
+    }
 
     #endregion
 }
