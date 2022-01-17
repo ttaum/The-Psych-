@@ -13,6 +13,7 @@ public class PlayerInputHandler : MonoBehaviour
     public bool ShiftInput { get; private set; } // Переменная для записи состояния сдвига
     public int AttackInput { get; private set; } // Переменная для перехода в состояние атаки
     public int DefenseInput { get; private set; } // Переменная для перехода в состояние защиты
+    public bool InteractionInput { get; private set; } // Переменная для взаимодействий
 
     [SerializeField]
     private float inputHoldTime = 0.2f; // Время которое ввод прыжка "истина" после нажатия
@@ -48,8 +49,8 @@ public class PlayerInputHandler : MonoBehaviour
     }
 
     public void UseJumpInput() => JumpInput = false;
-
     public void UseShiftInput() => ShiftInput = false;
+    public void UseInteractionInput() => InteractionInput = false;
 
     private void CheckJumpInputHoldTime() // Таймер после которого ввод прыжка становится "ложь" (используется для более приятного геймплея)
     {
@@ -102,5 +103,18 @@ public class PlayerInputHandler : MonoBehaviour
             DefenseInput = 0;
         }
     }
+
+    public void OnInteractionInput(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            InteractionInput = true;
+        }
+        else if (context.canceled)
+        {
+            InteractionInput = false;
+        }
+    }
+
 }
 

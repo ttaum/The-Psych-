@@ -11,6 +11,7 @@ public class InsanityStaticTrigger : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
+            Debug.Log("DEATH");
             // гдеяэ леярн дкъ декецюрю         
         }
     }
