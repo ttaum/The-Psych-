@@ -22,10 +22,12 @@ public class PlayerSpiritState : State
         DoChecks();
         player.Anim.speed = 0f;
         player.particleToSputnik.Play();
+        player.sputnikParticles.Play();
     }
 
     public override void Exit()
     {
+        player.sputnikParticles.Stop();
         base.Exit();
     }
 

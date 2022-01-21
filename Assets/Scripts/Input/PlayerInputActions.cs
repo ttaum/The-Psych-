@@ -89,6 +89,14 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""PlayerBranching"",
+                    ""type"": ""Value"",
+                    ""id"": ""7184a552-1501-4bd2-a4a3-65af1fba8995"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -197,7 +205,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard"",
                     ""action"": ""SputnikMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -208,7 +216,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard"",
                     ""action"": ""SputnikMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -219,7 +227,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard"",
                     ""action"": ""SputnikMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -256,6 +264,39 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                     ""action"": ""Defense"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""SW"",
+                    ""id"": ""2709761d-dcfc-4f61-b978-e9c02cfd54f2"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlayerBranching"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""3339b7f6-1726-49db-9b33-d09f27c2fe67"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""PlayerBranching"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""371d2f8b-a033-427f-90af-7367c08f701c"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""PlayerBranching"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -290,6 +331,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
         m_Gameplay_SputnikMovement = m_Gameplay.FindAction("SputnikMovement", throwIfNotFound: true);
         m_Gameplay_Attack = m_Gameplay.FindAction("Attack", throwIfNotFound: true);
         m_Gameplay_Defense = m_Gameplay.FindAction("Defense", throwIfNotFound: true);
+        m_Gameplay_PlayerBranching = m_Gameplay.FindAction("PlayerBranching", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -348,6 +390,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
     private readonly InputAction m_Gameplay_SputnikMovement;
     private readonly InputAction m_Gameplay_Attack;
     private readonly InputAction m_Gameplay_Defense;
+    private readonly InputAction m_Gameplay_PlayerBranching;
     public struct GameplayActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -361,6 +404,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
         public InputAction @SputnikMovement => m_Wrapper.m_Gameplay_SputnikMovement;
         public InputAction @Attack => m_Wrapper.m_Gameplay_Attack;
         public InputAction @Defense => m_Wrapper.m_Gameplay_Defense;
+        public InputAction @PlayerBranching => m_Wrapper.m_Gameplay_PlayerBranching;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -397,6 +441,9 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 @Defense.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnDefense;
                 @Defense.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnDefense;
                 @Defense.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnDefense;
+                @PlayerBranching.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPlayerBranching;
+                @PlayerBranching.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPlayerBranching;
+                @PlayerBranching.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPlayerBranching;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -428,6 +475,9 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 @Defense.started += instance.OnDefense;
                 @Defense.performed += instance.OnDefense;
                 @Defense.canceled += instance.OnDefense;
+                @PlayerBranching.started += instance.OnPlayerBranching;
+                @PlayerBranching.performed += instance.OnPlayerBranching;
+                @PlayerBranching.canceled += instance.OnPlayerBranching;
             }
         }
     }
@@ -452,5 +502,6 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
         void OnSputnikMovement(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
         void OnDefense(InputAction.CallbackContext context);
+        void OnPlayerBranching(InputAction.CallbackContext context);
     }
 }

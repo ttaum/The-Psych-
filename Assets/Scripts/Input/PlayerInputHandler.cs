@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerInputHandler : MonoBehaviour
 {
     public float MovementInput { get; private set; } // Переменная для записи ввода движения
+    public float BranchInput { get; private set; } // Ввод ветвления
     public bool JumpInput { get; private set; } // Переменная для записи ввода прыжка
     public bool JumpInputStop { get; private set; } // Переменная для снижения скорости прыжка ака регулирование высоты прыжка отжатием
     public int CrouchInput { get; private set; } // Переменная для записи ввода приседания
@@ -29,6 +30,11 @@ public class PlayerInputHandler : MonoBehaviour
         MovementInput = context.ReadValue<float>(); // Записываем значение передвижения      
     }
 
+    public void OnBranchInput(InputAction.CallbackContext context)
+    {
+        BranchInput = context.ReadValue<float>();
+    }
+
     public void OnMouseInput(InputAction.CallbackContext context)
     {
         MouseInput = context.ReadValue<Vector2>(); // Записываем значение координат указателя мышки
@@ -47,10 +53,6 @@ public class PlayerInputHandler : MonoBehaviour
             JumpInputStop = true;
         }
     }
-
-    public void UseJumpInput() => JumpInput = false;
-    public void UseShiftInput() => ShiftInput = false;
-    public void UseInteractionInput() => InteractionInput = false;
 
     private void CheckJumpInputHoldTime() // Таймер после которого ввод прыжка становится "ложь" (используется для более приятного геймплея)
     {
@@ -92,6 +94,7 @@ public class PlayerInputHandler : MonoBehaviour
         }
 
     }
+
     public void OnDefenseInput(InputAction.CallbackContext context)
     {
         if (context.started)
@@ -116,5 +119,8 @@ public class PlayerInputHandler : MonoBehaviour
         }
     }
 
+    public void UseJumpInput() => JumpInput = false;
+    public void UseShiftInput() => ShiftInput = false;
+    public void UseInteractionInput() => InteractionInput = false;
 }
 

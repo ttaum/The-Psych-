@@ -45,6 +45,7 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     public ParticleSystem particleToSputnik;
+    public ParticleSystem sputnikParticles;
 
     [SerializeField]
     public Transform sputnikPosition;

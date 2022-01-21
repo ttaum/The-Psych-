@@ -60,7 +60,7 @@ public class State  // Базовый класс для состояний игрока
         {
             player.InputHandler.UseShiftInput();
 
-            player.RB.constraints = RigidbodyConstraints2D.FreezePosition;
+            player.RB.constraints = RigidbodyConstraints2D.FreezeAll;
 
             stateMachine.ChangeState(player.SpiritState);
         }

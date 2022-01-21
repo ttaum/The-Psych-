@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class InsanityStaticTrigger : MonoBehaviour
 {
-
     public GameObject player;
 
     private void OnTriggerEnter2D(Collider2D collision)

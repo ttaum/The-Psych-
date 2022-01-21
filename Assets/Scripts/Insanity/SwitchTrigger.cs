@@ -22,10 +22,9 @@ public class SwitchTrigger : MonoBehaviour
     {
         if (collision.CompareTag("Player") && InputHandler.InteractionInput == true)
         {
-            // Вызываем делегата с логикой 
+            // Вызываем делегата с логикой триггера
             InsanityStatic.SetActive(false);
-            InputHandler.UseInteractionInput();
-       
+            InputHandler.UseInteractionInput();      
         }
     }
 }
