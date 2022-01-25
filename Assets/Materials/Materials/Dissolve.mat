@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shader Graphs_New Shader Graph 1
-  m_Shader: {fileID: -6465566751694194690, guid: 6df70363b444ec540a987bf4f4ee79a4, type: 3}
+  m_Name: Dissolve
+  m_Shader: {fileID: -6465566751694194690, guid: f0af0e8239d7d7a4999d2e40fdafb303, type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -20,11 +20,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 93e3bb3780e353b46956bd332baccd78, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _SampleTexture2D_1092713849e64a42b4321e1f9017b92c_Texture_1:
-        m_Texture: {fileID: 2800000, guid: 427523c43586b4646911d62c50547da7, type: 3}
+        m_Texture: {fileID: 2800000, guid: a4fbb80d6c341fe45ac9c7d5f36694a8, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -39,7 +35,9 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    m_Floats: []
+    m_Floats:
+    - _Fade: 1
+    - _Scale: 43.68
     m_Colors:
-    - _Color: {r: 0.3490566, g: 0.3490566, b: 0.3490566, a: 0}
+    - Color_7A0CCA10: {r: 12.047059, g: 12.047059, b: 12.047059, a: 1}
   m_BuildTextureStacks: []

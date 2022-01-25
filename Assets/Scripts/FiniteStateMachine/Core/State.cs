@@ -39,7 +39,7 @@ public class State  // Базовый класс для состояний игрока
             player.Anim.SetBool(previousState.animBoolName, false);
         } 
         startTime = Time.time;
-        Debug.Log("Player " + animBoolName);
+       // Debug.Log("Player " + animBoolName);
         player.Anim.SetBool(animBoolName, true);
         isAnimationFinished = false;
     }

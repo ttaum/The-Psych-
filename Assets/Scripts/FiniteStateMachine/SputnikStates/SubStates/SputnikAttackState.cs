@@ -27,6 +27,8 @@ public class SputnikAttackState : SputnikBindState
     {
         base.LogicUpdate();
 
+        sputnik.RayAttack();
+
         if (AttackInput == 0)
         {
             sputnikStateMachine.ChangeState(sputnik.IdleState);

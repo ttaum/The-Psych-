@@ -43,9 +43,14 @@ public class Sputnik : MonoBehaviour
     [SerializeField]
     public GameObject sputnikVcam;
 
+    [SerializeField]
+    public ParticleSystem hitParticles;
+
     #endregion
 
     #region Other variables
+
+    [SerializeField] private LayerMask WhatIsDestructible;
 
     #endregion
 
@@ -100,14 +105,13 @@ public class Sputnik : MonoBehaviour
     }
 
     public void FreeMovement() // Movement in free state
-    {
-        Vector3 toPos = new Vector3(transform.position.x, transform.position.y);
 
+    {
         Vector3 direction = MousePosition() - transform.position;
 
         if ((direction).magnitude > sputnikData.freeOffsetValue)
         {
-            toPos = MousePosition() - direction.normalized * sputnikData.freeOffsetValue;
+            Vector3 toPos = MousePosition() - direction.normalized * sputnikData.freeOffsetValue;
 
             Vector3 curPos = Vector3.Lerp(transform.position, toPos,
                 sputnikData.freeMovementDamp * Time.fixedDeltaTime);
@@ -153,6 +157,31 @@ public class Sputnik : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, rotation,
             sputnikData.bindRotationDamp * Time.deltaTime);
     } 
+
+    public void RayAttack()
+    {
+        Vector3 direction = MousePosition() - transform.position;
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction.normalized,
+            20f, WhatIsDestructible);
+
+        Debug.DrawLine(transform.position, MousePosition(), Color.green);
+        Debug.DrawLine(transform.position, hit.point, Color.red);
+
+        if (hit)
+        {
+            Debug.DrawRay(hit.point, hit.normal, Color.yellow);
+
+            Quaternion quaternion = Quaternion.LookRotation(hit.normal);
+
+            hitParticles.transform.position = hit.point;
+            hitParticles.transform.rotation = quaternion;
+
+            hitParticles.Play();
+
+            hit.transform.SendMessage("Dissolving");
+        }
+    }
 
     #endregion
 }

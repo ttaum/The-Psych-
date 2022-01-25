@@ -189,9 +189,11 @@ public class Player : MonoBehaviour
     public void CheckYarn()
     {
         // Cast a ray from player's position to his feet
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, CurrentVector, YarnCheckDistance, WhatIsYarn);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, CurrentVector,
+            YarnCheckDistance, WhatIsYarn);
 
-        // If raycast hits Yarn layer -> estimate angle between hit normal and CurrentVector to define
+        // If raycast hits Yarn layer -> estimate angle between hit
+        // normal and CurrentVector to define
         // the angle to rotate character/gravity/horizontalInput/jumpForce direction.
 
         if (hit)
