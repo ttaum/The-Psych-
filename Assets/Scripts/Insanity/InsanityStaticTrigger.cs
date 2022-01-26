@@ -4,14 +4,16 @@ using UnityEngine;
 
 public class InsanityStaticTrigger : MonoBehaviour
 {
+    [SerializeField]
+    private EventManager eventManager;
+
     public GameObject player;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            Debug.Log("DEATH");
-            // гдеяэ леярн дкъ декецюрю         
+            eventManager.DeathInvoke();
         }
     }
 }

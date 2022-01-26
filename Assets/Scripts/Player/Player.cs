@@ -24,6 +24,7 @@ public class Player : MonoBehaviour
     public PlayerInputHandler InputHandler { get; private set; } // Выделяем память под компонент ввода
     public Rigidbody2D RB { get; private set; }
     public CapsuleCollider2D MovementCollider { get; private set; }
+    public SpriteRenderer sprite { get; private set; }
 
     #endregion
 
@@ -46,6 +47,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     public ParticleSystem particleToSputnik;
     public ParticleSystem sputnikParticles;
+    public ParticleSystem deathParticles; 
 
     [SerializeField]
     public Transform sputnikPosition;
@@ -84,10 +86,15 @@ public class Player : MonoBehaviour
     private Vector2 gravityVector;
 
     public float SpiritEnterRadius { get; private set; } = 5.0f;
- 
+
     #endregion
 
     #region Unity Callback Functions
+
+    private void OnEnable()
+    {
+        EventManager.DeathEvent += DeathTrigger;
+    }
 
     private void Awake()
     {
@@ -109,6 +116,8 @@ public class Player : MonoBehaviour
     {
         Anim = GetComponent<Animator>(); // Референсим компонент аниматор
 
+        sprite = GetComponent<SpriteRenderer>(); 
+
         InputHandler = input.GetComponent<PlayerInputHandler>(); // Референсим компонент ввода
 
         RB = GetComponent<Rigidbody2D>();
@@ -127,6 +136,11 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         StateMachine.CurrentState.PhysicsUpdate();
+    }
+
+    private void OnDisable()
+    {
+        EventManager.DeathEvent -= DeathTrigger;
     }
 
     #endregion
@@ -267,6 +281,13 @@ public class Player : MonoBehaviour
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
         transform.localScale = theScale;
+    }
+
+    private void DeathTrigger()
+    {
+        Debug.Log("GG");
+        sprite.enabled = false;
+        deathParticles.Play();
     }
 
     private void AnimationTrigger() => StateMachine.CurrentState.AnimationTrigger();
