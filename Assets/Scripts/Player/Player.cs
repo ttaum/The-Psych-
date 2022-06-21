@@ -6,7 +6,8 @@ using Cinemachine;
 public class Player : MonoBehaviour
 {
     #region State Variables 
-    // Выделяем память под инстансы состояний
+
+    // State machine instances
     public StateMachine StateMachine { get; private set; }
     public PlayerIdleState IdleState { get; private set; }
     public PlayerMoveState MoveState { get; private set; }
@@ -20,8 +21,8 @@ public class Player : MonoBehaviour
     #endregion
 
     #region Components
-    public Animator Anim { get; private set; } // Выделяем память под аниматор
-    public PlayerInputHandler InputHandler { get; private set; } // Выделяем память под компонент ввода
+    public Animator Anim { get; private set; } 
+    public PlayerInputHandler InputHandler { get; private set; } 
     public Rigidbody2D RB { get; private set; }
     public CapsuleCollider2D MovementCollider { get; private set; }
     public SpriteRenderer sprite { get; private set; }
@@ -33,38 +34,41 @@ public class Player : MonoBehaviour
     [Header("Objects")]
 
     [SerializeField]
+    private PlayerData playerData;
+
+    [SerializeField]
     private GameObject input;
 
     [SerializeField]
     private Transform groundCheck;
 
     [SerializeField]
-    private PlayerData playerData;
-
-    [SerializeField]
     private Transform ceilingCheck;
 
     [SerializeField]
+    private Transform sputnikTransform;
+    public float SpiritEnterRadius { get; private set; } = 5.0f;
+
+
+    // Particles 
     public ParticleSystem particleToSputnik;
     public ParticleSystem sputnikParticles;
     public ParticleSystem deathParticles; 
-
-    [SerializeField]
-    public Transform sputnikPosition;
 
     #endregion
 
     #region Other variables
 
+    private Vector2 localVelocity; // Local speed  
+    private Vector2 globalVelocity; // Global speed
+    private Vector3 refVelocity; // technical value for smoothDamp func
+    private Vector2 globalJumpForce; // Global value for jump
+
     private Vector2 workspace;
-    private Vector2 localVelocity; // Локальная скорость перемещения  
-    private Vector2 globalVelocity; // Глобальная скорость перемещения
-    private Vector3 refVelocity; // тех. значение для smoothDamp
-    private Vector2 globalJumpForce; // Глобальное значение для прыжка
 
     [Header("Smoothing and damping")]
 
-    [Range(0, .2f)] [SerializeField] private float movementSmoothing = .01f;
+    [Range(0, .5f)] [SerializeField] private float movementSmoothing = .015f;
     [Range(0, 25f)] [SerializeField] private float smoothDampRotation = 1f;
 
     [Header("Other")]
@@ -72,20 +76,18 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask WhatIsYarn;
     [SerializeField] private float YarnCheckDistance;
 
+
+    // Technical  values
+
     private bool facingRight = true;
 
-    public bool isAirForceAllowed; // Для придания толчка в воздухе
-
-    public Vector2 CurrentVector { get; private set; } = Vector2.down;
-
-    private Quaternion currentQuat;
-
-    private Vector3 currentVectorEulerAngles;
     public float CurrentFloatEulerAngles { get; private set; }
-
+    private Vector2 CurrentVector  = Vector2.down;
+    private Vector2 OldCurrentVector = Vector2.down;
+    private Quaternion currentQuat;
+    private Vector3 currentVectorEulerAngles;
+    
     private Vector2 gravityVector;
-
-    public float SpiritEnterRadius { get; private set; } = 5.0f;
 
     #endregion
 
@@ -93,9 +95,8 @@ public class Player : MonoBehaviour
 
     private void OnEnable()
     {
-        EventManager.DeathEvent += DeathTrigger;
+       // EventManager.DeathEvent += DeathTrigger;
     }
-
     private void Awake()
     {
         // Создаем инстанс машины состояний
@@ -114,17 +115,17 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        Anim = GetComponent<Animator>(); // Референсим компонент аниматор
+        Anim = GetComponent<Animator>();
 
         sprite = GetComponent<SpriteRenderer>(); 
 
-        InputHandler = input.GetComponent<PlayerInputHandler>(); // Референсим компонент ввода
+        InputHandler = input.GetComponent<PlayerInputHandler>(); 
 
         RB = GetComponent<Rigidbody2D>();
 
         MovementCollider = GetComponent<CapsuleCollider2D>();
 
-        StateMachine.Initialize(IdleState); // Инициализация машины состояний
+        StateMachine.Initialize(IdleState); 
 
     }
 
@@ -140,50 +141,65 @@ public class Player : MonoBehaviour
 
     private void OnDisable()
     {
-        EventManager.DeathEvent -= DeathTrigger;
+      //  EventManager.DeathEvent -= DeathTrigger;
     }
 
     #endregion
 
-    #region Set functions
+    #region Set and Apply functions
 
-    // Пересчет локальной скорости в глобальную (лог.)
+    // Recalculation movement from local to global (logic)
     public void SetVelocity(float movementInput)
     {
-        localVelocity.Set(movementInput, 0f);    
+        localVelocity = transform.InverseTransformDirection(RB.velocity);
+        localVelocity.Set(movementInput, localVelocity.y);
         globalVelocity = transform.TransformDirection(localVelocity);      
     }
 
-    // Смягченное изменение скорости (физ.)
-    public void ApplyVelocity()
-    {
-        RB.velocity = Vector3.SmoothDamp(RB.velocity, globalVelocity, ref refVelocity, movementSmoothing);
-    }
-
-    public void SetJump(float localJumpForce)
+    // Smooth velocity change (physics)
+    public void ApplyVelocity() => RB.velocity = Vector3.SmoothDamp(RB.velocity, globalVelocity,
+        ref refVelocity, movementSmoothing);
+    
+    public void ApplyJump(float localJumpForce)
     {
         globalJumpForce = transform.TransformDirection(LocalRbVelocity().x, localJumpForce, 0f);
-
-        RB.velocity = globalJumpForce; // Через скорость
-       // RB.AddForce(globalJumpForce, ForceMode2D.Impulse); // Через силу
+        RB.velocity = globalJumpForce;    
     }
 
-    // Для придания толчка в воздухе
-
-    public void SetAirForce(float input) 
+    public void SetYarn()
     {
-        Vector2 localAirForce = new Vector2(playerData.airForce * input, 0); // мб переписать
-        Vector2 AirForce = transform.TransformDirection(localAirForce);
+        // Cast a ray from player's position to his feet
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, CurrentVector,
+            YarnCheckDistance, WhatIsYarn);
 
-        RB.AddForce(AirForce, ForceMode2D.Impulse);
+        // Calculate the difference normal and character
+        CurrentFloatEulerAngles = -Vector2.SignedAngle(hit.normal, Vector2.up);
+
+        // If raycast hits Yarn layer -> estimate angle between hit
+        // normal and CurrentVector to define
+        // the angle to rotate character/gravity/horizontalInput/jumpForce direction.
+
+        if (hit)
+        {
+            // Define new direction for RaycastHit
+            CurrentVector = -hit.normal;
+
+            ApplyRotation(CurrentFloatEulerAngles);
+
+            if (OldCurrentVector != CurrentVector)  // Changes grav if CurrentVector has changed
+            {
+                gravityVector.Set(CurrentVector.x * 9.8f, CurrentVector.y * 9.8f);
+
+                Physics2D.gravity = gravityVector;
+            }
+
+            OldCurrentVector = CurrentVector;
+
+            Debug.DrawRay(hit.point, hit.normal, Color.red);
+        }
     }
 
-    public Vector2 LocalRbVelocity()
-    {
-        return transform.InverseTransformDirection(RB.velocity);
-    }
-
-    public void SetRotation(float currentAngleGr)
+    public void ApplyRotation(float currentAngleGr)
     {
         currentVectorEulerAngles.Set(0f, 0f, currentAngleGr);
 
@@ -194,49 +210,22 @@ public class Player : MonoBehaviour
         if(Quaternion.Angle(transform.rotation, currentQuat) > .05f)
         {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, currentQuat, smoothDampRotation);
-        }         
+        }
     }
 
     #endregion
 
     #region Check functions
-    public void CheckYarn()
+
+    public void CheckIfFlip(float movementInput)
     {
-        // Cast a ray from player's position to his feet
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, CurrentVector,
-            YarnCheckDistance, WhatIsYarn);
-
-        // If raycast hits Yarn layer -> estimate angle between hit
-        // normal and CurrentVector to define
-        // the angle to rotate character/gravity/horizontalInput/jumpForce direction.
-
-        if (hit)
-        {
-            CurrentFloatEulerAngles = -Vector2.SignedAngle(hit.normal, Vector2.up);      
-                         
-            // Define new direction for RaycastHit
-            CurrentVector = -hit.normal;
-
-            SetRotation(CurrentFloatEulerAngles);
-
-            gravityVector.Set(CurrentVector.x * 9.8f, CurrentVector.y * 9.8f);
-
-            // Physics2D.gravity = new Vector2(CurrentVector.x, CurrentVector.y) * 9.8f;
-            Physics2D.gravity = gravityVector;
-
-            Debug.DrawRay(hit.point, hit.normal, Color.green);
-        }
-    }
-
-    public void CheckIfFlip(float input)
-    {
-        if (input > 0 && !facingRight)
+        if (movementInput > 0 && !facingRight)
         {
             // ... flip the player.
             Flip();
         }
         // Otherwise if the input is moving the player left and the player is facing right...
-        else if (input < 0 && facingRight)
+        else if (movementInput < 0 && facingRight)
         {
             // ... flip the player.
             Flip();
@@ -253,13 +242,13 @@ public class Player : MonoBehaviour
         return Physics2D.OverlapCircle(ceilingCheck.position, playerData.groundCheckRadius, playerData.whatIsGround);
     }
 
-    // Для придания толчка в воздухе
-
-    public void CheckIfAirForce(bool check) => isAirForceAllowed = check;
-
     #endregion
 
     #region Other functions
+
+    // Returns distance between sputnik and player
+    public float SputnikDistance() =>
+        (sputnikTransform.position - transform.position).magnitude;
 
     public void SetColliderHeight(float height)
     {
@@ -289,6 +278,13 @@ public class Player : MonoBehaviour
         sprite.enabled = false;
         deathParticles.Play();
     }
+
+    public Vector2 LocalRbVelocity()
+    {
+        return transform.InverseTransformDirection(RB.velocity);
+    }
+
+
 
     private void AnimationTrigger() => StateMachine.CurrentState.AnimationTrigger();
 

@@ -43,6 +43,6 @@ public class PlayerCrouchIdleState : PlayerGroundedState
 
         player.ApplyVelocity();
 
-        player.SetRotation(player.CurrentFloatEulerAngles);
+        player.ApplyRotation(player.CurrentFloatEulerAngles);
     }
 }

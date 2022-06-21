@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class PlayerGroundedState : State
 {
-    protected float movementInput; // Память для ввода движения
+    protected bool isGrounded; 
 
     protected bool isTouchingCeiling;
 
-    private bool jumpInput; // Память для ввода прыжка
+    protected float movementInput; 
+
+    private bool jumpInput;
 
     protected int crouchInput; 
-
-    protected bool isGrounded;
 
     public PlayerGroundedState(Player player, StateMachine stateMachine, PlayerData playerData, string animBoolName) :
         base(player, stateMachine, playerData, animBoolName)
@@ -30,8 +30,6 @@ public class PlayerGroundedState : State
     public override void Enter()
     {
         base.Enter();
-
-        player.JumpState.ResetAmountOfJumpsLeft(); // Обновляем количество прыжков
     }
 
     public override void Exit()
@@ -43,13 +41,13 @@ public class PlayerGroundedState : State
     {
         base.LogicUpdate();
 
-        movementInput = player.InputHandler.MovementInput; // Читаем ввод движения из Player
+        movementInput = player.InputHandler.MovementInput; 
 
         jumpInput = player.InputHandler.JumpInput;
 
         crouchInput = player.InputHandler.CrouchInput;
 
-        if (jumpInput && player.JumpState.CanJump())
+        if (jumpInput)
         {
             player.InputHandler.UseJumpInput();
             stateMachine.ChangeState(player.JumpState);
@@ -57,8 +55,16 @@ public class PlayerGroundedState : State
 
         if (!isGrounded)
         {
-            player.JumpState.DecreaseAmountOfJumpsLeft();
             stateMachine.ChangeState(player.InAirState);
+        }
+
+        if (crouchInput == 1 && movementInput == 0)
+        {
+            stateMachine.ChangeState(player.CrouchIdleState);
+        }
+        else if (crouchInput == 1 && movementInput != 0)
+        {
+            stateMachine.ChangeState(player.CrouchMoveState);
         }
     }
 
@@ -66,6 +72,6 @@ public class PlayerGroundedState : State
     {
         base.PhysicsUpdate();
 
-        player.CheckYarn();
+        player.SetYarn();
     }
 }

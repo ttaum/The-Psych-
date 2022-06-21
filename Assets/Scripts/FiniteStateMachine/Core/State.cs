@@ -2,13 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class State  // Базовый класс для состояний игрока
+public class State  
 {
-    public State previousState; // Для записи предыдущего состояния
-
     protected Player player;
-    
-    // protected = private, однако наследники имеют доступ к переменной 
 
     protected StateMachine stateMachine;
 
@@ -16,14 +12,13 @@ public class State  // Базовый класс для состояний игрока
 
     protected bool ShiftInput;
 
-    protected bool isAnimationFinished; // Переменная для флага конца анимации
+    protected bool isAnimationFinished; 
 
-    protected float startTime; // Сюда запишем время когда зашли в состояние
+    protected float startTime;
 
-    private string animBoolName; // Название анимации для аниматора
+    private string animBoolName;
 
     public State(Player player, StateMachine stateMachine, PlayerData playerData, string animBoolName) 
-        // Конструктор для инстанса состояния
     {
         this.player = player;
         this.stateMachine = stateMachine;
@@ -31,32 +26,25 @@ public class State  // Базовый класс для состояний игрока
         this.animBoolName = animBoolName;
     }
 
-    public virtual void Enter() // Функция выполняется при вхождении в состояние
+    public virtual void Enter() 
     {
         DoChecks();
-        if(previousState != null && previousState != player.SpiritState)
-        {
-            player.Anim.SetBool(previousState.animBoolName, false);
-        } 
-        startTime = Time.time;
-       // Debug.Log("Player " + animBoolName);
+
         player.Anim.SetBool(animBoolName, true);
+        Debug.Log("Player " + animBoolName);
         isAnimationFinished = false;
     }
 
-    public virtual void Exit() // Функция выполняется при выходе из состояния
+    public virtual void Exit()
     {
-        if(player.StateMachine.CurrentState == player.SpiritState)
-        {
-            player.Anim.SetBool(previousState.animBoolName, false);
-        }
+        player.Anim.SetBool(animBoolName, false);
     }
 
-    public virtual void LogicUpdate() // Выполняется каждый фрейм
+    public virtual void LogicUpdate() 
     {
         ShiftInput = player.InputHandler.ShiftInput;
 
-        if (ShiftInput && player.StateMachine.CurrentState != player.SpiritState) //Входим в состояние духа
+        if (ShiftInput && player.StateMachine.CurrentState != player.SpiritState) 
         {
             player.InputHandler.UseShiftInput();
 
@@ -66,12 +54,12 @@ public class State  // Базовый класс для состояний игрока
         }
     }
 
-    public virtual void PhysicsUpdate() // Выполняется каждый fixedupdate
+    public virtual void PhysicsUpdate() 
     {
         DoChecks();
     }
 
-    public virtual void DoChecks() // Выполняем все проверки
+    public virtual void DoChecks() 
     {
 
     }

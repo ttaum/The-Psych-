@@ -12,6 +12,7 @@ public class PlayerLandState : PlayerGroundedState
     {
         base.Enter();
 
+        player.SetVelocity(0f);
     }
     public override void LogicUpdate()
     {
@@ -25,16 +26,14 @@ public class PlayerLandState : PlayerGroundedState
         {
             stateMachine.ChangeState(player.IdleState);
         }
-        /*else if (ShiftInput && isGrounded)
-        {
-            stateMachine.ChangeState(player.SpiritState);
-        }*/
     }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
 
-        player.SetRotation(player.CurrentFloatEulerAngles);
+        player.ApplyRotation(player.CurrentFloatEulerAngles);
+
+        player.ApplyVelocity();
     }
 }

@@ -5,19 +5,19 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputHandler : MonoBehaviour
 {
-    public float MovementInput { get; private set; } // Переменная для записи ввода движения
-    public float BranchInput { get; private set; } // Ввод ветвления
-    public bool JumpInput { get; private set; } // Переменная для записи ввода прыжка
-    public bool JumpInputStop { get; private set; } // Переменная для снижения скорости прыжка ака регулирование высоты прыжка отжатием
-    public int CrouchInput { get; private set; } // Переменная для записи ввода приседания
-    public Vector2 MouseInput { get; private set; } // Переменная для записи ввода координат указателя мышки
-    public bool ShiftInput { get; private set; } // Переменная для записи состояния сдвига
-    public int AttackInput { get; private set; } // Переменная для перехода в состояние атаки
-    public int DefenseInput { get; private set; } // Переменная для перехода в состояние защиты
-    public bool InteractionInput { get; private set; } // Переменная для взаимодействий
+    public float MovementInput { get; private set; } 
+    public float BranchInput { get; private set; } 
+    public bool JumpInput { get; private set; } 
+    public bool JumpInputStop { get; private set; } 
+    public int CrouchInput { get; private set; } 
+    public Vector2 MouseInput { get; private set; } 
+    public bool ShiftInput { get; private set; } 
+    public int AttackInput { get; private set; } 
+    public int DefenseInput { get; private set; } 
+    public bool InteractionInput { get; private set; } 
 
     [SerializeField]
-    private float inputHoldTime = 0.2f; // Время которое ввод прыжка "истина" после нажатия
+    private float inputHoldTime = 0.2f; 
 
     private float jumpInputStartTime;
 
@@ -27,7 +27,7 @@ public class PlayerInputHandler : MonoBehaviour
     }
     public void OnMoveInput(InputAction.CallbackContext context)
     {
-        MovementInput = context.ReadValue<float>(); // Записываем значение передвижения      
+        MovementInput = context.ReadValue<float>();      
     }
 
     public void OnBranchInput(InputAction.CallbackContext context)
@@ -37,7 +37,7 @@ public class PlayerInputHandler : MonoBehaviour
 
     public void OnMouseInput(InputAction.CallbackContext context)
     {
-        MouseInput = context.ReadValue<Vector2>(); // Записываем значение координат указателя мышки
+        MouseInput = context.ReadValue<Vector2>(); 
     }
 
     public void OnJumpInput(InputAction.CallbackContext context)

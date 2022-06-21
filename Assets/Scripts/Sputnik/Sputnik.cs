@@ -7,7 +7,8 @@ public class Sputnik : MonoBehaviour
 
 {
     #region State Variables 
-    // Выделяем память под инстансы состояний
+
+    // Sputnik State Machine instances
     public SputnikStateMachine SputnikStateMachine { get; private set; }
     public SputnikIdleState IdleState { get; private set; }
     public SputnikFreeState FreeState { get; private set; }
@@ -105,7 +106,7 @@ public class Sputnik : MonoBehaviour
     }
 
     public void FreeMovement() // Movement in free state
-
+        // ПЕРЕДЕЛАТЬ НА ПЕРЕДВИЖЕНИЕ С ПОМОЩЬЮ СИЛЫ
     {
         Vector3 direction = MousePosition() - transform.position;
 
@@ -148,6 +149,7 @@ public class Sputnik : MonoBehaviour
         Vector3 curPos = Vector3.Lerp(transform.position, toPos,
             sputnikData.bindMovememtDamp * Time.fixedDeltaTime);
         transform.position = curPos;
+       
 
         // Alligning X local axis with direction
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;

@@ -8,19 +8,14 @@ public class PlayerSpiritState : State
     {
     }
 
-    private bool isGrounded;
-
     public override void DoChecks()
     {
         base.DoChecks();
-
-        isGrounded = player.CheckIfGrounded();
     }
 
     public override void Enter()
     {
-        DoChecks();
-        player.Anim.speed = 0f;
+        base.Enter();
         player.particleToSputnik.Play();
         player.sputnikParticles.Play();
     }
@@ -35,19 +30,15 @@ public class PlayerSpiritState : State
     {
         base.LogicUpdate();
 
-        float distance = (player.sputnikPosition.position -
-            player.transform.position).magnitude;
 
-        if (ShiftInput && distance < player.SpiritEnterRadius) // Выходим из состояния духа если находимся близко
+        if (ShiftInput && player.SputnikDistance() < player.SpiritEnterRadius) 
         {
             player.InputHandler.UseShiftInput();
-
-            player.Anim.speed = 1f; // Продолжаем анимации
 
             player.RB.constraints = RigidbodyConstraints2D.None;
             player.RB.constraints = RigidbodyConstraints2D.FreezeRotation;
 
-            stateMachine.ChangeState(previousState);
+            stateMachine.ChangeState(player.IdleState);
         }
         else
         {
@@ -59,6 +50,6 @@ public class PlayerSpiritState : State
     {
         base.PhysicsUpdate();
 
-        player.CheckYarn();
+        player.SetYarn();
     }
 }

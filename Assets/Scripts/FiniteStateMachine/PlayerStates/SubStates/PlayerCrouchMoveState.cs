@@ -44,7 +44,7 @@ public class PlayerCrouchMoveState : PlayerGroundedState
 
         player.ApplyVelocity();
 
-        player.CheckYarn();
+        player.SetYarn();
     }
 }
 

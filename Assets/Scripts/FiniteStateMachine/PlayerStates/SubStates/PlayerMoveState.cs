@@ -32,13 +32,9 @@ public class PlayerMoveState : PlayerGroundedState
 
         player.CheckIfFlip(movementInput);
        
-        if (movementInput == 0) // Условие перехода в состояние бездействия
+        if (movementInput == 0)
         {
             stateMachine.ChangeState(player.IdleState);
-        }
-        else if (crouchInput == 1)
-        {
-            stateMachine.ChangeState(player.CrouchMoveState);
         }
     }
 

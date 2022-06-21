@@ -24,8 +24,6 @@ public class PlayerInAirState : State
     public override void Enter()
     {
         base.Enter();
-
-         player.isAirForceAllowed = true; //Для придания толчка в воздухе
     }
 
     public override void Exit()
@@ -37,44 +35,31 @@ public class PlayerInAirState : State
     {
         base.LogicUpdate();
 
-        movementInput = player.InputHandler.MovementInput; //Для придания толчка в воздухе
+        player.CheckIfFlip(movementInput);
 
         jumpInput = player.InputHandler.JumpInput;
 
         jumpInputStop = player.InputHandler.JumpInputStop;
 
-        CheckJumpMultiplier();
+        HeightJumpMultiplier();
 
-        if (isGrounded && player.LocalRbVelocity().y < 0.01f) // Условия перехода в состояние приземления = на земле + скорость меньше 0.01f
+        if (isGrounded && player.LocalRbVelocity().y < 0.01f) // ref 
         {
             stateMachine.ChangeState(player.LandState);
         }
-        else if (jumpInput && player.JumpState.CanJump())
-        {
-            player.InputHandler.UseJumpInput();
-            stateMachine.ChangeState(player.JumpState);
-        }
         else
         {
-            player.Anim.SetFloat("yVelocity", player.LocalRbVelocity().y); // Передача значения вертикальной скорости аниматору
-
-            // Придание толчка в воздухе
-
-            if (player.isAirForceAllowed && movementInput != 0)
-            {
-                player.SetAirForce(movementInput);
-                player.isAirForceAllowed = false;
-            }
+            player.Anim.SetFloat("yVelocity", player.LocalRbVelocity().y); 
         }
     }
 
-    private void CheckJumpMultiplier() // Применяем множитель к прыжку если отжат пробел
+    private void HeightJumpMultiplier() // Adjustable Jump Height
     {
         if (isJumping)
         {
             if (jumpInputStop)
             {
-                player.SetJump(player.LocalRbVelocity().y * playerData.variableJumpHeightMultiplier);
+                player.ApplyJump(player.LocalRbVelocity().y * playerData.variableJumpHeightMultiplier);
                 isJumping = false;
             }
             else if (player.LocalRbVelocity().y <= 0f)
@@ -88,7 +73,7 @@ public class PlayerInAirState : State
     {
         base.PhysicsUpdate();
 
-        player.CheckYarn();
+        player.SetYarn();
     }
 
     public void SetIsJumping() => isJumping = true;
