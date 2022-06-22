@@ -16,7 +16,7 @@ public class PlayerData : ScriptableObject
     [Header("In Air State")]
     // public float coyoteTime = 0.2f; Äëÿ coyote
     public float variableJumpHeightMultiplier = 0.5f;
-    public float airForce = 10f;
+    public float falloffGravityScale = 6f;
 
     [Header("Crouch States")]
     public float crouchMovementVelocity = 5f;

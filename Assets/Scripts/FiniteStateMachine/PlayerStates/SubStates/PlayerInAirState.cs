@@ -29,11 +29,15 @@ public class PlayerInAirState : State
     public override void Exit()
     {
         base.Exit();
+
+        player.RB.gravityScale = 3f;
     }
 
     public override void LogicUpdate()
     {
         base.LogicUpdate();
+
+        movementInput = player.InputHandler.MovementInput;
 
         player.CheckIfFlip(movementInput);
 
@@ -43,7 +47,12 @@ public class PlayerInAirState : State
 
         HeightJumpMultiplier();
 
-        if (isGrounded && player.LocalRbVelocity().y < 0.01f) // ref 
+        if (player.LocalRbVelocity().y < 0f)
+        {
+            player.RB.gravityScale = playerData.falloffGravityScale;
+        }
+
+        if (isGrounded && player.LocalRbVelocity().y < 0.01f)
         {
             stateMachine.ChangeState(player.LandState);
         }

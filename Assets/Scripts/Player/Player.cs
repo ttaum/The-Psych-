@@ -126,7 +126,6 @@ public class Player : MonoBehaviour
         MovementCollider = GetComponent<CapsuleCollider2D>();
 
         StateMachine.Initialize(IdleState); 
-
     }
 
     private void Update()
