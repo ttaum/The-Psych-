@@ -295,6 +295,10 @@ public class Player : MonoBehaviour
     private void OnDrawGizmos() // Радиус сцепки со спутником
     {
         Gizmos.DrawWireSphere(transform.position, SpiritEnterRadius);
+
+        Vector3 vector3current = CurrentVector;
+
+        Gizmos.DrawLine(transform.position, transform.position + vector3current * YarnCheckDistance);
     }
 
     #endregion
