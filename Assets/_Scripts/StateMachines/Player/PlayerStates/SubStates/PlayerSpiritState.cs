@@ -29,26 +29,19 @@ public class PlayerSpiritState : State
     public override void LogicUpdate()
     {
         base.LogicUpdate();
-
-
-       /* if (ShiftInput && player.SputnikDistance() < player.SpiritEnterRadius) 
+        
+        if (InputManager.Instance.PullInput == false)
         {
-            player.InputHandler.UseShiftInput();
-
-            player.RB.constraints = RigidbodyConstraints2D.None;
-            player.RB.constraints = RigidbodyConstraints2D.FreezeRotation;
-
             stateMachine.ChangeState(player.IdleState);
         }
-        else
-        {
-            player.InputHandler.UseShiftInput();
-        }*/
     }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
+
+        player.RB.velocity = Sputnik.Instance.transform.position -
+            player.transform.position;
 
         player.SetYarn();
     }

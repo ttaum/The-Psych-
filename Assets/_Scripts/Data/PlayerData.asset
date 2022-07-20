@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayerData
   m_EditorClassIdentifier: 
   movementVelocity: 25
-  jumpForce: 25
+  jumpForce: 20
   amountOfJumps: 2
   variableJumpHeightMultiplier: 0.5
   falloffGravityScale: 5

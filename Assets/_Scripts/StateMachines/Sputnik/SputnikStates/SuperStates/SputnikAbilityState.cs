@@ -28,14 +28,11 @@ public class SputnikAbilityState : SputnikState
     {
         base.LogicUpdate();
 
-        sputnik.MousePosition();
-
     }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
 
-        sputnik.FreeMovement();
     }
 }

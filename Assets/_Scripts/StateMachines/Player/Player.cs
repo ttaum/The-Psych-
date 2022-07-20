@@ -59,7 +59,6 @@ public class Player : Singleton<Player>
     private Vector2 localVelocity; // Local speed  
     private Vector2 globalVelocity; // Global speed
     private Vector3 refVelocity; // technical value for smoothDamp func
-    private Vector2 globalJumpForce; // Global value for jump
 
     private Vector2 workspace;
 
@@ -79,6 +78,7 @@ public class Player : Singleton<Player>
     private bool facingRight = true;
 
     public float CurrentFloatEulerAngles { get; private set; }
+
     private Vector2 CurrentVector  = Vector2.down;
     private Vector2 OldCurrentVector = Vector2.down;
     private Quaternion currentQuat;
@@ -94,6 +94,7 @@ public class Player : Singleton<Player>
     {
        // EventManager.DeathEvent += DeathTrigger;
     }
+
     protected override void Awake()
     {
         base.Awake();
@@ -150,9 +151,9 @@ public class Player : Singleton<Player>
     public void ApplyVelocity() => RB.velocity = Vector3.SmoothDamp(RB.velocity, globalVelocity,
         ref refVelocity, movementSmoothing);
     
-    public void ApplyJump(float localJumpForce)
+    public void ApplyJump(float localJumpForce) // *** V 1 stroky mojno
     {
-        globalJumpForce = transform.TransformDirection(LocalRbVelocity().x, localJumpForce, 0f);
+        Vector2 globalJumpForce = transform.TransformDirection(LocalRbVelocity().x, localJumpForce, 0f);
         RB.velocity = globalJumpForce;    
     }
 
@@ -196,11 +197,13 @@ public class Player : Singleton<Player>
         // Euler -> quaternion
         currentQuat.eulerAngles = currentVectorEulerAngles;
 
-        // rotate Player
-        if(Quaternion.Angle(transform.rotation, currentQuat) > .05f)
-        {
+        // rotate Player ***** rabotaet li
+        if (Quaternion.Angle(transform.rotation, currentQuat) > .05f) 
             transform.rotation = Quaternion.RotateTowards(transform.rotation, currentQuat, smoothDampRotation);
-        }
+
+        /*  {
+              transform.rotation = Quaternion.RotateTowards(transform.rotation, currentQuat, smoothDampRotation);
+          }*/
     }
 
     #endregion
@@ -282,7 +285,7 @@ public class Player : Singleton<Player>
     #endregion
 
     #region Editor
-    private void OnDrawGizmos() // Радиус сцепки со спутником
+    private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, SpiritEnterRadius);
 

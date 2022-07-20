@@ -28,7 +28,7 @@ public class PlayerInAirState : State
     {
         base.Exit();
 
-        player.RB.gravityScale = 3f;
+    //    player.RB.gravityScale = 3f;
     }
 
     public override void LogicUpdate()
@@ -41,7 +41,7 @@ public class PlayerInAirState : State
 
         if (player.LocalRbVelocity().y < 0f)
         {
-            player.RB.gravityScale = playerData.falloffGravityScale;
+         //   player.RB.gravityScale = playerData.falloffGravityScale;
         }
 
         if (isGrounded && player.LocalRbVelocity().y < 0.01f)

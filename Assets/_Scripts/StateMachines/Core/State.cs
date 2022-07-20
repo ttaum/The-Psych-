@@ -18,7 +18,8 @@ public class State
 
     private string animBoolName;
 
-    public State(Player player, StateMachine stateMachine, PlayerData playerData, string animBoolName) 
+    public State(Player player, StateMachine stateMachine,
+        PlayerData playerData, string animBoolName) 
     {
         this.player = player;
         this.stateMachine = stateMachine;
@@ -42,16 +43,12 @@ public class State
 
     public virtual void LogicUpdate() 
     {
-        /*   ShiftInput = player.InputHandler.ShiftInput;
+        if (InputManager.Instance.PullInput == true 
+                && stateMachine.CurrentState != player.SpiritState) 
+        {           
+            stateMachine.ChangeState(player.SpiritState);
+        }
 
-           if (ShiftInput && player.StateMachine.CurrentState != player.SpiritState) 
-           {
-               player.InputHandler.UseShiftInput();
-
-               player.RB.constraints = RigidbodyConstraints2D.FreezeAll;
-
-               stateMachine.ChangeState(player.SpiritState);
-           }*/
     }
 
     public virtual void PhysicsUpdate() 

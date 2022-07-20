@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SputnikData
   m_EditorClassIdentifier: 
   offsetValue: 4
-  movementSpeed: 1
-  accelertaionDamp: 1
-  decelerationDamp: 0.5
+  movementSpeed: 2
+  accelertaionDamp: 4
+  decelerationDamp: 10
   rotationDamp: 2

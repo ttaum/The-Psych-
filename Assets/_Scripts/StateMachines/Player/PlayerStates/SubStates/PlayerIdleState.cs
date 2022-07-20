@@ -29,7 +29,7 @@ public class PlayerIdleState : PlayerGroundedState
     {
         base.LogicUpdate();
 
-        if (InputManager.Instance.MovementInput != 0) // Условие перехода в состояние движения
+        if (InputManager.Instance.MovementInput != 0) 
         {
             stateMachine.ChangeState(player.MoveState);
         }

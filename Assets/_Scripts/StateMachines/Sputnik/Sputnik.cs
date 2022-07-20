@@ -5,7 +5,6 @@ using Cinemachine;
 
 public class Sputnik : Singleton<Sputnik>
 {
-
     #region State Variables 
 
     public SputnikStateMachine SputnikStateMachine { get; private set; }
@@ -28,14 +27,14 @@ public class Sputnik : Singleton<Sputnik>
     [SerializeField]
     private SputnikData sputnikData;
 
-    [SerializeField]
-    public ParticleSystem hitParticles;
-
     #endregion
 
     #region Other variables
 
     private Plane MainPlane = new Plane(Vector3.forward, Vector3.zero);
+
+    private Vector3 direction;
+    private Vector2 curVelocity;
 
     [SerializeField] private LayerMask WhatIsDestructible;
 
@@ -76,50 +75,56 @@ public class Sputnik : Singleton<Sputnik>
 
     #region Functions
 
-    public Vector3 MousePosition() //Follow-point calculation
+    public void SetVelocity()
     {
         // Ray from camera to mouse position
         Ray ray = Camera.main.ScreenPointToRay(InputManager.Instance.MouseInput);
+
         // If ray intersects with plane return point of intersection
-        if (MainPlane.Raycast(ray, out float dist))
-        {
-            return ray.GetPoint(dist);
-        }
-        return Vector3.zero;
+        direction = MainPlane.Raycast(ray, out float dist) ? ray.GetPoint(dist) - transform.position : Vector3.zero;
+
+        // Calculate velocity vector based on direction
+        curVelocity = direction * sputnikData.movementSpeed;
+
     }
 
-    public void FreeMovement()     
-    {
-        Vector3 direction = MousePosition() - transform.position;
+    public void ApplyVelocity(Vector2 curVelocity, float Damp) => 
+        RB.velocity = Vector3.Lerp(RB.velocity, curVelocity, Damp * Time.fixedDeltaTime);
 
-        Vector2 curVelocity = direction * sputnikData.movementSpeed;
+    public void SputnikFreeMove()     
+    {
 
         if ((direction).magnitude > sputnikData.offsetValue)
         {
-            RBvelocity(curVelocity, sputnikData.accelertaionDamp);
+            ApplyVelocity(curVelocity, sputnikData.accelertaionDamp);
         }
         else
         {
-            RBvelocity(curVelocity, sputnikData.decelerationDamp);
+            ApplyVelocity(curVelocity, sputnikData.decelerationDamp);
         }
-        
+
+    } 
+
+    public void SputnikRotation()
+    {
         // Alligning X local axis with direction
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
-        // Smooth approach
+        // Smoothing
         transform.rotation = Quaternion.Slerp(transform.rotation, rotation,
-            sputnikData.rotationDamp * Time.deltaTime);
-    } 
+            sputnikData.rotationDamp * Time.fixedDeltaTime);
+    }
 
-    public void RayAttack()
+
+    /*public void RayAttack()
     {
-        Vector3 direction = MousePosition() - transform.position;
+        Vector3 direction = SetVelocity() - transform.position;
 
         RaycastHit2D hit = Physics2D.Raycast(transform.position, direction.normalized,
             20f, WhatIsDestructible);
 
-        Debug.DrawLine(transform.position, MousePosition(), Color.green);
+        Debug.DrawLine(transform.position, SetVelocity(), Color.green);
         Debug.DrawLine(transform.position, hit.point, Color.red);
 
         if (hit)
@@ -135,9 +140,7 @@ public class Sputnik : Singleton<Sputnik>
 
             hit.transform.SendMessage("Dissolving");
         }
-    }
-
-    public void RBvelocity(Vector2 curVelocity, float Damp) => RB.velocity = Vector3.Lerp(RB.velocity, curVelocity, Damp);
+    }*/
 
     #endregion
 

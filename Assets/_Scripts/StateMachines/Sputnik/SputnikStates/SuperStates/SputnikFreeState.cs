@@ -28,7 +28,7 @@ public class SputnikFreeState : SputnikState
     {
         base.LogicUpdate();
 
-        sputnik.MousePosition();
+        sputnik.SetVelocity();
       
     }
 
@@ -36,6 +36,7 @@ public class SputnikFreeState : SputnikState
     {
         base.PhysicsUpdate();
 
-        sputnik.FreeMovement();
+        sputnik.SputnikFreeMove();
+        sputnik.SputnikRotation();
     }
 }
